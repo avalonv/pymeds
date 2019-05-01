@@ -14,7 +14,7 @@ start program
 #if there are no instances it
 
 +enter loop
-  #check len of Medicine.instances. if it's zero add_medicine() is called
+  #check len of Medication.instances. if it's zero add_medication() is called
   #otherwise, call get_nextintake() on each of them
   #get_nextintake()
   #each med is displayed next to a number, which will be the index in the Medicinies.instances list
@@ -34,7 +34,7 @@ start program
       -go back to beggining of loop
 
     +add
-      #start add_medicine()
+      #start add_medication()
       -go back to beggining of loop
 
     +quit
@@ -112,13 +112,13 @@ def required_ask(of_type, prompt):
         else: print("Can't be empty")
     return safe_cast(of_type, ui)
 
-class Medicine:
+class Medication:
     instances = []
     def __init__(self, name_generic, name_brand, dosage, doses_pc, cycle_len, notes, doses_taken=0, cycle_end=None, last_taken=None):
 
         # append newly created instance
-        #index=len(Medicine.instances) # use a dict? idk tbh
-        Medicine.instances.append(self)
+        #index=len(Medication.instances) # use a dict? idk tbh
+        Medication.instances.append(self)
 
         # the name of the medication
         # string. ex: "estradiol"
@@ -231,7 +231,7 @@ class Medicine:
             return False
 
 
-def add_medicine():
+def add_medication():
     while True:
         name_generic = required_ask(str,'Med name')
         name_brand = optional_ask(str, 'Brand name')
@@ -241,10 +241,10 @@ def add_medicine():
         notes = optional_ask(str, 'Notes')
         doses_taken = 0
         last_taken = time_now()
-        cycle_end = time_now() + (86400 * cycle_len) #TODO date today + how long a cycle lasts # this is wrong
+        cycle_end = increase_date(date_from_timestamp(time_now()), cycle_len) # cycle_ends = date today + cycle lenght
         print(cycle_end)
 
-        new_med = Medicine(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, doses_taken, cycle_end, last_taken)
+        new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, doses_taken, cycle_end, last_taken)
         print("Created:",new_med)
 
         if input('break? ') == 'q':
@@ -256,7 +256,7 @@ def save_to_file():
 
 #(self, name_generic, name_brand, dosage, doses_pc, cycle_len, doses_taken, last_taken):
     save_data = []
-    for med in Medicine.instances:
+    for med in Medication.instances:
         attribute_dict = vars(med)
         save_data.append(attribute_dict)
 
@@ -277,7 +277,7 @@ def load_instances():
 
         for med in load_data:
             # this is probably not safe :(
-            exec_str = 'load_med = Medicine('
+            exec_str = 'load_med = Medication('
             for key,val in med.items():
                 exec_str += f"{key}='{val}',"
 
@@ -304,12 +304,12 @@ def strike(text):
     return result
 
 def loop():
-    if len(Medicine.instances) == 0:
-        add_medicine()
+    if len(Medication.instances) == 0:
+        add_medication()
 
     def print_all():
         i = 0
-        for med in Medicine.instances:
+        for med in Medication.instances:
             if med.check_nextintake():
                 print(f"  {i} - {med} [{med.get_dosesremaining()}] {med.get_lastintake()}")
             else:
@@ -331,7 +331,7 @@ def loop():
         print(num_choice)
 
         if action_choice == 'a': # add
-            add_medicine()
+            add_medication()
 
         if action_choice == 'q': # quit
             break
@@ -342,12 +342,12 @@ def loop():
                 print(index)
                 # catch index error
                 try:
-                    selected = Medicine.instances[index]
+                    selected = Medication.instances[index]
                 except (IndexError):
                     continue
                 print(f'Delete {selected}?', end=': ')
                 if input().lower() in 'y':
-                    Medicine.instances.remove(index)
+                    Medication.instances.remove(index)
                 else:
                     continue
 
@@ -355,7 +355,7 @@ def loop():
             for index in num_choice:
                 # catch index error
                 try:
-                    selected = Medicine.instances[index]
+                    selected = Medication.instances[index]
                 except (IndexError):
                     continue
                 selected.take()
@@ -365,7 +365,7 @@ def loop():
             for index in num_choice:
                 # catch index error
                 try:
-                    selected = Medicine.instances[index]
+                    selected = Medication.instances[index]
                 except (IndexError):
                     continue
                 selected.untake()
