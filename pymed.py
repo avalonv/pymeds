@@ -51,6 +51,10 @@ end program
 # hardcoded for now:
 my_file = 'a.json'
 
+# :g/debug_log/d
+def debug_log(*msg):
+    print('log:', [item for item in msg])
+
 def time_now():
     return round(time.time())
 
@@ -70,7 +74,7 @@ def date_to_timestamp(my_date):
     return int(time.mktime(time.strptime(str(my_date), '%Y-%m-%d')))
 
 def timestamp_to_date(my_timestamp):
-    return datetime.date.fromtimestamp(my_timestamp)
+    return date.fromtimestamp(my_timestamp)
 
 def increase_date(my_date, num):
     return my_date + timedelta(days=num)
@@ -153,7 +157,7 @@ class Medication:
         # timestamp of when the current cycle begins
         # int. ex:
         self.cycle_end = safe_cast(int, cycle_end)
-        print("line 147, type(self.cycle_end):", type(self.cycle_end))
+        debug_log("type(self.cycle_end)", type(self.cycle_end))
 
     def __str__(self):
         if self.name_brand != None:
@@ -190,9 +194,8 @@ class Medication:
         return f"{self.doses_taken}/{self.doses_pc}"
 
     def _advance_next_cycle(self):
-        print("updating", self)
-        print(self.cycle_end)
-        #date_ce = datetime.date.fromtimestamp(self.cycle_end)
+        debug_log("_advance_next_cycle for", str(self), "self.cycle_end", self.cycle_end)
+        #date_ce = date.fromtimestamp(self.cycle_end)
         date_ce = timestamp_to_date(self.cycle_end)
 
         '''
@@ -216,10 +219,10 @@ class Medication:
             # spiro advance cycle
         '''
         if date.fromtimestamp(self.last_taken) + timedelta(days=self.cycle_len) < date.today():
-            print(f"{self}._update - 1")
+            debug_log(f"{self}._update - 1")
             self._advance_next_cycle()
         elif self.cycle_end < time_now():
-            print(f"{self}._update - 2")
+            debug_log(f"{self}._update - 2")
             self._advance_next_cycle()
 
     def check_nextintake(self):
@@ -240,8 +243,9 @@ def add_medication():
         notes = optional_ask(str, 'Notes')
         doses_taken = 0
         last_taken = time_now()
-        cycle_end = increase_date(date_from_timestamp(time_now()), cycle_len) # cycle_ends = date today + cycle lenght
-        print(cycle_end)
+        cycle_end = increase_date(timestamp_to_date(time_now()), cycle_len) # cycle_ends = date today + cycle lenght
+        cycle_end = date_to_timestamp(cycle_end)
+        debug_log('add_medication new cycle_end', cycle_end)
 
         new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, doses_taken, cycle_end, last_taken)
         print("Created:",new_med)
@@ -253,7 +257,6 @@ def add_medication():
 def save_to_file():
     # this should only be called ONCE each time the program runs
 
-#(self, name_generic, name_brand, dosage, doses_pc, cycle_len, doses_taken, last_taken):
     save_data = []
     for med in Medication.instances:
         attribute_dict = vars(med)
@@ -261,7 +264,6 @@ def save_to_file():
 
     with open(my_file, 'w') as save_file:
         json.dump(save_data, save_file, indent=2)
- #date_cc = datetime.datetime.strptime(current_cycle, '%Y-%m-%d'))
 
 def load_instances():
     # this should only be called ONCE each time the program runs
@@ -271,7 +273,7 @@ def load_instances():
                 load_data = json.load(load_file)
             # no records exist
             except (ValueError):
-                print("no records found")
+                debug_log('load_instances ValueError: no records found')
                 return None
 
         for med in load_data:
@@ -282,7 +284,7 @@ def load_instances():
 
             exec_str = exec_str[:-1] # cut last comma
             exec_str += ')'
-    #        print(exec_str)
+            debug_log('load_instances exec_str', exec_str)
             exec(exec_str) # garbage collection :(
 
     except (FileNotFoundError):
@@ -321,13 +323,13 @@ def loop():
         try:
             # first char in index that can't be an int or space
             action_choice = [char for char in choice.split(' ') if char != '' and not safe_cast(int, char)][0]
-            print(action_choice)
+            debug_log('action_choice', action_choice)
         except (IndexError):
             # user typed nothing
             continue
         # all chars that can be an int (return cast = False so 0 passes the condition)
         num_choice = [safe_cast(int, char) for char in choice if safe_cast(int, char, return_cast=False)]
-        print(num_choice)
+        debug_log('num_choice', num_choice)
 
         if action_choice == 'a': # add
             add_medication()
