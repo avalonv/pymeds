@@ -1,6 +1,6 @@
-#pymeds
+# pymeds
 
-###Work in Progress
+### Work in Progress
 
 Simple CLI tool to track medication routines.
 
