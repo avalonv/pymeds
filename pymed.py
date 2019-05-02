@@ -326,6 +326,8 @@ def save_to_file():
 
     with open(my_file, 'w') as save_file:
         json.dump(save_data, save_file, indent=2)
+        if logging:
+            print(json.dumps(save_data, indent=2))
 
 def load_instances():
     # this should only be called ONCE each time the program runs
