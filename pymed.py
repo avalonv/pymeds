@@ -81,6 +81,13 @@ def timestamp_to_date(my_timestamp):
 def increase_date(my_date, num):
     return my_date + timedelta(days=num)
 
+def strike(text):
+    # :pray: https://stackoverflow.com/a/25244576/8225672
+    result = ''
+    for c in text:
+        result = result + c + '\u0336'
+    return result
+
 def safe_cast(of_type, val, default=None, return_cast=True):
     # :pray: https://stackoverflow.com/a/6330109/8225672
     try:
@@ -196,9 +203,9 @@ class Medication:
         return f"{self.doses_taken}/{self.doses_pc}"
 
     def _advance_next_cycle(self):
-        debug_log("_advance_next_cycle for", str(self), "self.cycle_end", self.cycle_end)
         #date_ce = date.fromtimestamp(self.cycle_end)
         date_ce = timestamp_to_date(self.cycle_end)
+        debug_log("_advance_next_cycle for", str(self), "starting date_ce", date_ce)
 
         '''
         # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
@@ -207,8 +214,10 @@ class Medication:
         #while (date_ce + timedelta(days=self.cycle_len)) < date.today():
         while date_ce < date.today():
             #date_ce = date_ce + timedelta(days=self.cycle_len)
+            debug_log('_advance_next_cycle increasing date_ce', date_ce)
             date_ce = increase_date(date_ce, self.cycle_len)
         self.doses_taken = 0
+        debug_log('_advance_next_cycle updated date_ce is', date_ce)
 
         #self.cycle_end = int(time.mktime(time.strptime(str(date_ce), '%Y-%m-%d')))
         self.cycle_end = date_to_timestamp(date_ce)
@@ -224,7 +233,7 @@ class Medication:
             debug_log(f"{self}._update - 1")
             self._advance_next_cycle()
         elif self.cycle_end < time_now():
-            debug_log(f"{self}._update - 2")
+            debug_log(f"{self}._update - 2 {self.cycle_end} < {time_now()}")
             self._advance_next_cycle()
 
     def check_nextintake(self):
@@ -250,11 +259,10 @@ def add_medication():
         debug_log('add_medication new cycle_end', cycle_end)
 
         new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, doses_taken, cycle_end, last_taken)
-        print("Created:",new_med)
+        debug_log("add_medication created:", new_med)
 
         if input('break? ') == 'q':
             break
-
 
 def save_to_file():
     # this should only be called ONCE each time the program runs
@@ -292,19 +300,13 @@ def load_instances():
     except (FileNotFoundError):
         choice = input(f"'{my_file}' doesn't exist. create? ").lower()
         if choice == 'y':
+            debug_log('load_instances FileNotFoundError create', my_file)
             open(my_file, 'w')
         else:
             print("quitting")
             exit(1)
 
     return True
-
-def strike(text):
-    # :pray: https://stackoverflow.com/a/25244576/8225672
-    result = ''
-    for c in text:
-        result = result + c + '\u0336'
-    return result
 
 def loop():
     if len(Medication.instances) == 0:
