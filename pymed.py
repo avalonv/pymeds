@@ -344,7 +344,10 @@ def load_instances():
             # this is probably not safe :(
             exec_str = 'load_med = Medication('
             for key,val in med.items():
-                exec_str += f"{key}='{val}',"
+                if val == None:
+                    exec_str += f"{key}=None,"
+                else:
+                    exec_str += f"{key}='{val}',"
 
             exec_str = exec_str[:-1] # cut last comma
             exec_str += ')'
