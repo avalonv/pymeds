@@ -50,10 +50,12 @@ end program
 
 # hardcoded for now:
 my_file = 'a.json'
+logging = True
 
 # :g/debug_log/d
 def debug_log(*msg):
-    print('log:', [item for item in msg])
+    if logging:
+        print('log:', [item for item in msg])
 
 def time_now():
     return round(time.time())
