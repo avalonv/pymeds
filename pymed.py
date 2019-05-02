@@ -98,16 +98,15 @@ def strikethrough(text):
 # :pray: https://stackoverflow.com/a/6330109/8225672
 # this function does way too much shit at once
 def safe_cast(of_type, val, default=None, rtn_cast=True):
-    if val != None: # for the love of god don't make None a string
-        try:
-            cast_val = of_type(val)
-            if rtn_cast:
-                return cast_val
-            else:
-                return True
-        except (ValueError, TypeError):
-            return default
-    else:
+    if val == None: # for the love of god don't make None a string
+        return default
+    try:
+        cast_val = of_type(val)
+        if rtn_cast:
+            return cast_val
+        else:
+            return True
+    except (ValueError, TypeError):
         return default
 
 def optional_ask(of_type, prompt):
@@ -194,6 +193,7 @@ class Medication:
         self.counter = safe_cast(int, counter)
 
     def __str__(self):
+        debug_log('__str__', self.name_brand)
         string = f"{self.name_generic}"
         if self.name_brand != None:
             string = f"{self.name_brand} ({self.name_generic})"
