@@ -212,7 +212,7 @@ class Medication:
         # doses_taken = 0
         '''
         #while (date_ce + timedelta(days=self.cycle_len)) < date.today():
-        while date_ce < date.today():
+        while date_ce <= date.today():
             #date_ce = date_ce + timedelta(days=self.cycle_len)
             debug_log('_advance_next_cycle increasing date_ce', date_ce)
             date_ce = increase_date(date_ce, self.cycle_len)
