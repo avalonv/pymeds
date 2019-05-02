@@ -366,6 +366,7 @@ def loop():
     while True:
         clear_screen()
         list_meds()
+        save_to_file()
         choice = input("[A]dd new, [R]emove, [T]ake, [U]ntake, [I]nfo, [Q]uit: ").lower()
         try:
             # first char in index that isn't an int or space
@@ -427,8 +428,6 @@ def loop():
                 except (IndexError):
                     continue
             input('')
-
-        save_to_file()
 
 try:
     load_instances()
