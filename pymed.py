@@ -391,18 +391,15 @@ def loop():
 
         if action_choice == 'r': # remove
             print(num_choice)
-            for index in num_choice:
-                print(index)
-                # catch index error
-                try:
-                    selected = Medication.instances[index]
-                except (IndexError):
-                    continue
-                print(f'Delete {selected}?', end=': ')
-                if input().lower() in 'y':
-                    Medication.instances.remove(selected)
-                else:
-                    continue
+            try:
+                selected = Medication.instances[num_choice[0]]
+            except (IndexError):
+                continue
+            print(f'Delete {selected}?', end=': ')
+            if input().lower() in 'y':
+                Medication.instances.remove(selected)
+            else:
+                continue
 
         if action_choice == 't': # take
             for index in num_choice:
