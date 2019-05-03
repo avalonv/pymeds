@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# TODO:
+# sanity check doses_pc and cycle_len (both have to be >= 1 or god knows what'll happen)
+# change my_file's location to be a hidden file in the home directory
+# make remove prompt to remove all indexes passed, instead of just the first
+# add an option to not clear the screen or list anything, pass arguments to the file, interpret them and then exit
+# add another option to list all meds and quit
+# add another option to disaply usage and quit
 
 from datetime import date, timedelta
 import json
