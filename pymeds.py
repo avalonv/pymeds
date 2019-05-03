@@ -3,49 +3,6 @@ import json
 import time
 import os
 
-#TODO:
-
-"""
-start program
-
-+load my_file.
-#if there are no instances it
-
-+enter loop
-  #check len of Medication.instances. if it's zero add_med() is called
-  #otherwise, call get_nextintake() on each of them
-  #get_nextintake()
-  #each med is displayed next to a number, which is its index in the Medicinies.instances list
-  #choice_action is what function/method will be called, followed by choice_num, the instance(s) it affects
-  #actions:
-
-    +mark meds that were taken
-      #call .take() on the instance. increase doses_taken and updated last_taken timestamp
-      -go back to beggining of loop
-
-    +unmark meds
-      #call .untake() on the instance. just decreases doses_taken
-      -go back to beggining of loop
-
-    +delete
-      #simply call remove (index) on the instances list
-      -go back to beggining of loop
-
-    +add
-      #start add_med()
-      -go back to beggining of loop
-
-    +quit
-      -breaks from the loop
-
-+serialize the instances as json objects and save them to my_file
-
-end program
-
-  cycle will be reset every 24 hours, or a multiple of this
-  each instance has a timestamp of when it was last taken
-"""
-
 # hardcoded for now:
 my_file = 'meds.json'
 logging = False
