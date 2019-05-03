@@ -15,6 +15,7 @@ import os
 # hardcoded for now:
 my_file = 'meds.json'
 logging = False
+clear = False
 
 def usage():
     print('''usage:
@@ -31,7 +32,7 @@ def debug_log(*msg):
 
 # :pray: https://stackoverflow.com/a/19596793/8225672
 def clear_screen():
-    if not logging:
+    if not logging and clear:
         os.system('clear') # clear output
         #print('=======================================================')
     else:
@@ -382,7 +383,6 @@ def loop():
                 except (IndexError):
                     continue
                 selected.take()
-
 
         if action_choice == 'u': # untake
             for index in num_choice:
