@@ -140,7 +140,7 @@ def required_ask(of_type, prompt):
 
 class Medication:
     instances = []
-    def __init__(self, name_generic, name_brand, dosage, doses_pc, cycle_len, notes=None, cycle_end=None, created_on=None, doses_taken=0, counter=0, last_taken=None):
+    def __init__(self, name_generic, name_brand, dosage, doses_pc, cycle_len, notes=None, cycle_end=None, created_on=None, doses_taken=0, total_taken=0, last_taken=None):
 
         # append newly created instance
         #index=len(Medication.instances) # use a dict? idk tbh
@@ -190,7 +190,7 @@ class Medication:
 
         # number of times the meds was taken
         # int: ex: 30
-        self.counter = safe_cast(int, counter)
+        self.total_taken = safe_cast(int, total_taken)
 
     def __str__(self):
         debug_log('__str__', self.name_brand)
@@ -204,14 +204,14 @@ class Medication:
     def take(self):
         self.last_taken = time_now()
         self.doses_taken += 1
-        self.counter += 1
+        self.total_taken += 1
 
     def untake(self):
         if self.doses_taken > 0:
             self.doses_taken -= 1
 
-        if self.counter > 0:
-            self.counter -= 1
+        if self.total_taken > 0:
+            self.total_taken -= 1
 
     def get_lastintake(self):
         if self.last_taken != None:
@@ -242,7 +242,7 @@ class Medication:
         infostr += f'(counter resets on {timestamp_to_date(self.cycle_end)})'
         if self.notes != None:
             infostr += f'\nnotes: {self.notes}'
-        infostr += f'\ncounter: {self.counter}'
+        infostr += f'\ntotal: {self.total_taken}'
         infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
         return infostr
 
