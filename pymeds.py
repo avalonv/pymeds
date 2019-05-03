@@ -10,10 +10,10 @@ my_file = 'meds.json'
 logging = False
 
 def usage():
-    print('''
+    print('''usage:
     [A]ction followed by one or more indexes.
     Index is the number to the left of each medication listed.
-    Ex: `t 0 1` will mark meds with indexes zero and one as taken.
+    Ex: `t 0 1` will mark meds with indexes zero and one as [t]aken.
     ''')
 
 # spits garbage
@@ -338,7 +338,7 @@ def loop():
         clear_screen()
         list_meds()
         save_to_file()
-        choice = input("[A]dd new, [R]emove, [T]ake, [U]ntake, [I]nfo, [Q]uit: ").lower()
+        choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, [Q]uit: ").lower()
         try:
             # first char in index that isn't an int or space
             action_choice = [char for char in choice.split(' ') if char != '' and not safe_cast(int, char)][0]
@@ -352,7 +352,7 @@ def loop():
         if action_choice == 'q': # quit
             break
 
-        if action_choice == 'a': # add
+        if action_choice == 'n': # new
             add_med()
 
         if action_choice == 'r': # remove
