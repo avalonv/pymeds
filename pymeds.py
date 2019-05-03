@@ -355,6 +355,8 @@ def loop():
             continue
         # all chars that can be an int (return cast = False so 0 passes the condition)
         num_choice = [safe_cast(int, char) for char in choice if safe_cast(int, char, rtn_cast=False)]
+        # sort and reverse so remove doesn't fail on incrementing indexes
+        num_choice.sort(reverse=True)
         debug_log('num_choice', num_choice)
 
         if action_choice == 'q': # quit
@@ -364,16 +366,16 @@ def loop():
             add_med()
 
         if action_choice == 'r': # remove
-            print(num_choice)
-            try:
-                selected = Medication.instances[num_choice[0]]
-            except (IndexError):
-                continue
-            print(f"delete '{selected}'?", end=': ')
-            if input().lower() in 'y':
-                Medication.instances.remove(selected)
-            else:
-                continue
+            for index in num_choice:
+                try:
+                    selected = Medication.instances[index]
+                except (IndexError):
+                    continue
+                print(f"delete '{selected}'?", end=': ')
+                if input().lower() in 'y':
+                    Medication.instances.remove(selected)
+                else:
+                    continue
 
         if action_choice == 't': # take
             for index in num_choice:
