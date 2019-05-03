@@ -256,12 +256,12 @@ def add_med():
         clear_screen()
         print("creating new medication")
 
-        name_generic = required_ask(str, 'Generic name')
-        name_brand   = optional_ask(str, 'Brand name')
-        dosage       = optional_ask(str, 'Dosage')
-        doses_pc     = required_ask(int, 'Take ... dose(s)')
-        cycle_len    = required_ask(int, 'Every ... day(s)')
-        notes        = optional_ask(str, 'Notes')
+        name_generic = required_ask(str, 'generic name')
+        name_brand   = optional_ask(str, 'brand name')
+        dosage       = optional_ask(str, 'dosage')
+        doses_pc     = required_ask(int, 'take ... dose(s)')
+        cycle_len    = required_ask(int, 'every ... day(s)')
+        notes        = optional_ask(str, 'notes')
         created_on   = time_now()
         # cycle_ends = date today + cycle lenght
         cycle_end    = increase_date(timestamp_to_date(created_on), cycle_len)
@@ -271,7 +271,7 @@ def add_med():
         new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, cycle_end, created_on)
         print('created', str(new_med))
 
-        if input('Add another? ').lower() == 'y':
+        if input('add another? ').lower() == 'y':
             continue
         break
 
@@ -352,7 +352,7 @@ def loop():
                 selected = Medication.instances[num_choice[0]]
             except (IndexError):
                 continue
-            print(f'Delete {selected}?', end=': ')
+            print(f"delete '{selected}'?", end=': ')
             if input().lower() in 'y':
                 Medication.instances.remove(selected)
             else:
