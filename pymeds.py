@@ -9,6 +9,13 @@ import os
 my_file = 'meds.json'
 logging = False
 
+def usage():
+    print('''
+    [A]ction followed by one or more indexes.
+    Index is the number to the left of each medication listed.
+    Ex: `t 0 1` will mark meds with indexes zero and one as taken.
+    ''')
+
 # spits garbage
 # :g/debug_log/d
 def debug_log(*msg):
@@ -388,6 +395,11 @@ def loop():
                     print(f'{index}: {selected.get_info()}')
                 except (IndexError):
                     continue
+            input('')
+
+        if action_choice == 'h':
+            clear_screen()
+            usage()
             input('')
 
 try:
