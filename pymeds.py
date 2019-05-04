@@ -17,6 +17,7 @@ my_file = 'meds.json'
 logging = False
 clear = True
 
+
 def usage():
     print('''usage:
     [A]ction followed by one or more indexes.
@@ -24,11 +25,13 @@ def usage():
     Ex: `t 0 1 q` will mark meds with indexes zero and one as [t]aken and quit.
     ''')
 
+
 # spits garbage
 # :g/debug_log/d
 def debug_log(*msg):
     if logging:
         print('log:', [item for item in msg])
+
 
 # :pray: https://stackoverflow.com/a/19596793/8225672
 def clear_screen():
@@ -38,29 +41,38 @@ def clear_screen():
     else:
         debug_log('clear_screen()')
 
+
 def time_now():
     return round(time.time())
+
 
 def seconds_passed(timestamp):
     return round(time_now() - timestamp)
 
+
 def minutes_passed(timestamp):
     return round(seconds_passed(timestamp) / 60)
+
 
 def hours_passed(timestamp):
     return round(minutes_passed(timestamp) / 60)
 
+
 def days_passed(timestamp):
     return round(hours_passed(timestamp) / 24)
+
 
 def date_to_timestamp(my_date):
     return int(time.mktime(time.strptime(str(my_date), '%Y-%m-%d')))
 
+
 def timestamp_to_date(my_timestamp):
     return date.fromtimestamp(my_timestamp)
 
+
 def increase_date(my_date, num):
     return my_date + timedelta(days=num)
+
 
 # :pray: https://stackoverflow.com/a/25244576/8225672
 def strikethrough(text):
@@ -68,6 +80,7 @@ def strikethrough(text):
     for c in text:
         result = result + c + '\u0336'
     return result
+
 
 # :pray: https://stackoverflow.com/a/6330109/8225672
 # this function does way too much shit at once
@@ -82,6 +95,7 @@ def safe_cast(of_type, val, default=None, rtn_cast=True):
             return True
     except (ValueError, TypeError):
         return default
+
 
 def optional_ask(of_type, prompt):
     prompt += ': '
@@ -103,6 +117,7 @@ def optional_ask(of_type, prompt):
             break
     return safe_cast(of_type, choice)
 
+
 def required_ask(of_type, prompt):
     prompt += ' *'
     while True:
@@ -112,12 +127,13 @@ def required_ask(of_type, prompt):
         else: print("this field can't be empty")
     return safe_cast(of_type, choice)
 
+
 class Medication:
     instances = []
     def __init__(self, name_generic, name_brand, dosage, doses_pc, cycle_len, notes=None, cycle_end=None, created_on=None, doses_taken=0, total_taken=0, last_taken=None):
 
         # append newly created instance
-        #index=len(Medication.instances) # use a dict? idk tbh
+        # index=len(Medication.instances) # use a dict? idk tbh
         Medication.instances.append(self)
 
         # the name of the medication
@@ -220,7 +236,6 @@ class Medication:
         infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
         return infostr
 
-
     def get_dosesremaining(self):
         return f"{self.doses_taken}/{self.doses_pc}"
 
@@ -241,15 +256,15 @@ class Medication:
             # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
             # doses_taken = 0
             '''
-            #while (date_ce + timedelta(days=self.cycle_len)) < date.today():
+            # while (date_ce + timedelta(days=self.cycle_len)) < date.today():
             while date_ce <= date.today():
-                #date_ce = date_ce + timedelta(days=self.cycle_len)
+                # date_ce = date_ce + timedelta(days=self.cycle_len)
                 debug_log('_update increasing date_ce', date_ce)
                 date_ce = increase_date(date_ce, self.cycle_len)
             self.doses_taken = 0
             debug_log('_update updated date_ce is', date_ce)
 
-            #self.cycle_end = int(time.mktime(time.strptime(str(date_ce), '%Y-%m-%d')))
+            # self.cycle_end = int(time.mktime(time.strptime(str(date_ce), '%Y-%m-%d')))
             self.cycle_end = date_to_timestamp(date_ce)
 
     def check_nextintake(self):
@@ -259,6 +274,7 @@ class Medication:
         else:
             return False
 
+
 def list_meds():
     i = 0
     for med in Medication.instances:
@@ -267,6 +283,7 @@ def list_meds():
         else:
             print(f"✓ {i} -", strikethrough(f"[{med.get_dosesremaining()}] {med}"))
         i += 1
+
 
 def add_med():
     while True:
@@ -292,6 +309,7 @@ def add_med():
             continue
         break
 
+
 def save_to_file():
     save_data = []
     for med in Medication.instances:
@@ -302,6 +320,7 @@ def save_to_file():
         json.dump(save_data, save_file, indent=2)
         if logging:
             print(json.dumps(save_data, indent=2))
+
 
 def load_instances():
     # this should only be called ONCE each time the program runs
@@ -339,6 +358,7 @@ def load_instances():
 
     return True
 
+
 def loop():
     def parse_choice(text):
         ''' each non numeral character becomes an action, with every numeral to the
@@ -364,10 +384,10 @@ def loop():
     while True:
         clear_screen()
         list_meds()
-        save_to_file()
         choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, [Q]uit: ").lower()
         for action, nums in parse_choice(choice).items():
             nums.sort(reverse=True)
+            save_to_file()
             debug_log('action', action)
             debug_log('nums', nums)
 
@@ -423,9 +443,11 @@ def loop():
                 usage()
                 input('')
 
-try:
-    load_instances()
-    loop()
-except (KeyboardInterrupt):
-    print('')
-    exit(1)
+
+if __name__ == "__main__":
+    try:
+        load_instances()
+        loop()
+    except (KeyboardInterrupt):
+        print('')
+        exit(1)
