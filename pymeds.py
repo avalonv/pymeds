@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 # TODO:
-# change my_file's location to be a hidden file in the home directory
+# add a calendar, proper day by day tracking? also a prompt to check if the user took the meds they were supposed
+# to when the counter resets and doses_taken is less than doses
 # add an option to not clear the screen or list anything, pass arguments to the file, interpret them and then exit
 # add another option to list all meds and quit
 # add another option to disaply usage and quit
 
 from datetime import date, timedelta
+from os import path, system
 import json
 import time
-import os
 
 # hardcoded for now:
-my_file = 'meds.json'
+my_file = path.expanduser('~/.meds.json')
 logging = False
 clear = True
 
@@ -34,7 +35,7 @@ def debug_log(*msg):
 # :pray: https://stackoverflow.com/a/19596793/8225672
 def clear_screen():
     if not logging and clear:
-        os.system('clear') # clear output
+        system('clear') # clear output
         #print('=======================================================')
     else:
         debug_log('clear_screen()')
