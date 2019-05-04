@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # TODO:
-# sanity check doses_pc and cycle_len (both have to be >= 1 or god knows what'll happen)
 # change my_file's location to be a hidden file in the home directory
-# make remove prompt to remove all indexes passed, instead of just the first
 # add an option to not clear the screen or list anything, pass arguments to the file, interpret them and then exit
 # add another option to list all meds and quit
 # add another option to disaply usage and quit
@@ -151,11 +149,13 @@ class Medication:
         # the number of doses to be taken per cycle
         # int.    ex: 1
         self.doses_pc = safe_cast(int, doses_pc)
+        if self.doses_pc < 1: self.doses_pc = 1
 
         # the number of days in each cycle
         # (how long until the doses_taken counter is reset)
         # int:   ex: 3
         self.cycle_len = safe_cast(int, cycle_len)
+        if self.cycle_len < 1: self.cycle_len = 1
 
         # any notes about the medication
         # str.   ex: "take 2 hours after eating"
