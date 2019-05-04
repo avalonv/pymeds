@@ -21,7 +21,7 @@ def usage():
     print('''usage:
     [A]ction followed by one or more indexes.
     Index is the number to the left of each medication listed.
-    Ex: `t 0 1` will mark meds with indexes zero and one as [t]aken.
+    Ex: `t 0 1 q` will mark meds with indexes zero and one as [t]aken and quit.
     ''')
 
 # spits garbage
@@ -413,7 +413,7 @@ def loop():
                     # catch index error
                     try:
                         selected = Medication.instances[index]
-                        print(f'{index}: {selected.get_info()}')
+                        print(f'{index} - {selected.get_info()}')
                     except (IndexError):
                         continue
                 input('')
