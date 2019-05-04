@@ -15,7 +15,7 @@ import os
 # hardcoded for now:
 my_file = 'meds.json'
 logging = False
-clear = False
+clear = True
 
 def usage():
     print('''usage:
@@ -340,6 +340,25 @@ def load_instances():
     return True
 
 def loop():
+    def parse_choice(text):
+        ''' each non numeral character becomes an action, with every numeral to the
+        left of it assigned to a list, until the next non numeral character is read
+        and so on
+        '''
+        actions = {}
+        current_action = None
+        for word in text.split(' '):
+            if not word == '':
+                if not safe_cast(int, word, rtn_cast=False, default=False):
+                    current_action = word
+                    if not current_action in actions:
+                        actions[current_action] = []
+                # check if current_action exists before adding anything
+                elif current_action != None:
+                    actions[current_action].append(int(word))
+
+        return actions
+
     if len(Medication.instances) == 0:
         add_med()
     while True:
@@ -347,69 +366,62 @@ def loop():
         list_meds()
         save_to_file()
         choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, [Q]uit: ").lower()
-        try:
-            # first char in index that isn't an int or space
-            action_choice = [char for char in choice.split(' ') if char != '' and not safe_cast(int, char)][0]
-            debug_log('action_choice', action_choice)
-        except (IndexError): # user typed nothing
-            continue
-        # all chars that can be an int (return cast = False so 0 passes the condition)
-        num_choice = [safe_cast(int, char) for char in choice if safe_cast(int, char, rtn_cast=False)]
-        # sort and reverse so remove doesn't fail on incrementing indexes
-        num_choice.sort(reverse=True)
-        debug_log('num_choice', num_choice)
+        for action, nums in parse_choice(choice).items():
+            nums.sort(reverse=True)
+            debug_log('action', action)
+            debug_log('nums', nums)
 
-        if action_choice == 'q': # quit
-            break
+            if action == 'q': # quit
+                exit(0)
 
-        if action_choice == 'n': # new
-            add_med()
+            if action == 'n': # new
+                add_med()
 
-        if action_choice == 'r': # remove
-            for index in num_choice:
-                try:
-                    selected = Medication.instances[index]
-                except (IndexError):
-                    continue
-                print(f"delete '{selected}'?", end=': ')
-                if input().lower() in 'y':
-                    Medication.instances.remove(selected)
-                else:
-                    continue
+            if action == 'r': # remove
+                for index in nums:
+                    try:
+                        selected = Medication.instances[index]
+                    except (IndexError):
+                        continue
+                    print(f"delete '{selected}'?", end=': ')
+                    if input().lower() in 'y':
+                        Medication.instances.remove(selected)
+                    else:
+                        continue
 
-        if action_choice == 't': # take
-            for index in num_choice:
-                # catch index error
-                try:
-                    selected = Medication.instances[index]
-                except (IndexError):
-                    continue
-                selected.take()
+            if action == 't': # take
+                for index in nums:
+                    # catch index error
+                    try:
+                        selected = Medication.instances[index]
+                    except (IndexError):
+                        continue
+                    selected.take()
 
-        if action_choice == 'u': # untake
-            for index in num_choice:
-                # catch index error
-                try:
-                    selected = Medication.instances[index]
-                except (IndexError):
-                    continue
-                selected.untake()
+            if action == 'u': # untake
+                for index in nums:
+                    # catch index error
+                    try:
+                        selected = Medication.instances[index]
+                    except (IndexError):
+                        continue
+                    selected.untake()
 
-        if action_choice == 'i': # info
-            clear_screen()
-            for index in num_choice:
-                # catch index error
-                try:
-                    selected = Medication.instances[index]
-                    print(f'{index}: {selected.get_info()}')
-                except (IndexError):
-                    continue
-            input('')
+            if action == 'i': # info
+                clear_screen()
+                for index in nums:
+                    # catch index error
+                    try:
+                        selected = Medication.instances[index]
+                        print(f'{index}: {selected.get_info()}')
+                    except (IndexError):
+                        continue
+                input('')
 
-        if action_choice == 'h':
-            clear_screen()
-            usage()
-            input('')
+            if action == 'h':
+                clear_screen()
+                usage()
+                input('')
 
 try:
     load_instances()
