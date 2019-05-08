@@ -8,6 +8,7 @@
 
 from datetime import date, timedelta
 from os import path, system
+from re import search
 import json
 import time
 
@@ -360,14 +361,18 @@ def loop():
         current_action = None
         for word in text.split(' '):
             if not word == '':
-                if not safe_cast(int, word, rtn_cast=False, default=False):
+                # if word not a number or '*'
+                if search('\d|\*', word) == None:
                     current_action = word
                     if not current_action in actions:
                         actions[current_action] = []
                 # check if current_action exists before adding anything
                 elif current_action != None:
-                    actions[current_action].append(int(word))
-
+                    if word == '*':
+                        allnums = [num for num in range(0, len(Medication.instances))]
+                        actions[current_action] = allnums
+                    else:
+                        actions[current_action].append(int(word))
         return actions
 
     if len(Medication.instances) == 0:
