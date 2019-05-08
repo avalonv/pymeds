@@ -36,7 +36,6 @@ def debug_log(*msg):
 def clear_screen():
     if not logging and clear:
         system('clear') # clear output
-        #print('=======================================================')
     else:
         debug_log('clear_screen()')
 
@@ -173,7 +172,6 @@ class Medication:
         # timestamp of when the current cycle ends and the counter is reset
         # int. ex: 1556679600
         self.cycle_end = safe_cast(int, cycle_end)
-        debug_log("type(self.cycle_end)", type(self.cycle_end))
 
         # timestamp of when the medication was created
         # int: ex: 1556766000
@@ -184,7 +182,6 @@ class Medication:
         self.total_taken = safe_cast(int, total_taken)
 
     def __str__(self):
-        debug_log('__str__', self.name_brand)
         string = f"{self.name_generic}"
         if self.name_brand != None:
             string = f"{self.name_brand} ({self.name_generic})"
@@ -209,21 +206,17 @@ class Medication:
             modifier = 's'
             base = seconds_passed(self.last_taken)
             if base > 60:
-                debug_log(f'get_lastintake base {base}s')
                 base = minutes_passed(self.last_taken)
                 modifier = 'm'
             if base > 60:
-                debug_log(f'get_lastintake base {base}m')
                 base = hours_passed(self.last_taken)
                 modifier = 'h'
             if base > 48:
-                debug_log(f'get_lastintake base {base}h')
                 base = days_passed(self.last_taken)
                 modifier = 'days'
             #return f'{base}{modifier}'
             return f'last taken {base}{modifier} ago'
         else:
-            debug_log(f'get_lastintake last_taken {self.last_taken}')
             return ''
 
     def get_info(self):
@@ -302,7 +295,6 @@ def add_med():
         cycle_end    = increase_date(timestamp_to_date(created_on), cycle_len)
         cycle_end    = date_to_timestamp(cycle_end)
 
-        debug_log('add_med new cycle_end', cycle_end)
         new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, cycle_end, created_on)
         print('created', str(new_med))
 
@@ -319,8 +311,6 @@ def save_to_file():
 
     with open(my_file, 'w') as save_file:
         json.dump(save_data, save_file, indent=2)
-        if logging:
-            print(json.dumps(save_data, indent=2))
 
 
 def load_instances():
@@ -346,7 +336,7 @@ def load_instances():
             exec_str = exec_str[:-1] # cut last comma
             exec_str += ')'
             debug_log('load_instances exec_str', exec_str)
-            exec(exec_str) # garbage collection :(
+            exec(exec_str)
 
     except (FileNotFoundError):
         choice = input(f"'{my_file}' doesn't exist. create? ").lower()
