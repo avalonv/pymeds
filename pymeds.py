@@ -377,17 +377,19 @@ def loop():
 
     if len(Medication.instances) == 0:
         add_med()
+    clear_screen()
     while True:
-        clear_screen()
         list_meds()
         choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, [Q]uit: ").lower()
         for action, nums in parse_choice(choice).items():
+            clear_screen()
             nums.sort(reverse=True)
             save_to_file()
             debug_log('action', action)
             debug_log('nums', nums)
 
             if action == 'q': # quit
+                list_meds()
                 exit(0)
 
             if action == 'n': # new
