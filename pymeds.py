@@ -214,7 +214,7 @@ class Medication:
                 modifier = 'h'
             if base > 48:
                 base = days_passed(self.last_taken)
-                modifier = 'days'
+                modifier = ' days'
             #return f'{base}{modifier}'
             return f'last taken {base}{modifier} ago'
         else:
