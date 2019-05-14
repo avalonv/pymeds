@@ -36,7 +36,8 @@ def debug_log(*msg):
 # :pray: https://stackoverflow.com/a/19596793/8225672
 def clear_screen():
     if not logging and clear:
-        system('clear') # clear output
+        # clear output
+        system('clear')
     else:
         debug_log('clear_screen()')
 
@@ -84,7 +85,8 @@ def strikethrough(text):
 # :pray: https://stackoverflow.com/a/6330109/8225672
 # this function does way too much shit at once
 def safe_cast(of_type, val, default=None, rtn_cast=True):
-    if val == None: # for the love of god don't make None a string
+    # for the love of god don't make None a string
+    if val is None:
         return default
     try:
         cast_val = of_type(val)
@@ -106,11 +108,11 @@ def optional_ask(of_type, prompt):
         if choice == '':
             return None
         # if checking for an int and the user types '0' this condition will pass (which is not good)
-        #elif safe_cast(of_type, choice, default=False) == False:
+        # elif safe_cast(of_type, choice, default=False) == False:
         # check against None instead because (0 == False) = True; but (0 == None) = False
-        elif safe_cast(of_type, choice, rtn_cast=False) == None:
+        elif safe_cast(of_type, choice, rtn_cast=False) is None:
             print(f'(must be {str(of_type)})')
-             #type(of_type).__name__  or .__class__.__name__ doesn't work for some reason?
+            # type(of_type).__name__  or .__class__.__name__ doesn't work for some reason?
             continue
         else:
             break
@@ -121,15 +123,21 @@ def required_ask(of_type, prompt):
     prompt += ' *'
     while True:
         choice = optional_ask(of_type, prompt)
-        if choice != None or '':
+        if choice is not None or '':
             break
-        else: print("this field can't be empty")
+        else:
+            print("this field can't be empty")
     return safe_cast(of_type, choice)
 
 
 class Medication:
     instances = []
-    def __init__(self, name_generic, name_brand, dosage, doses_pc, cycle_len, notes=None, cycle_end=None, created_on=None, doses_taken=0, total_taken=0, last_taken=None):
+
+    def __init__(
+            self, name_generic, name_brand,
+            dosage, doses_pc, cycle_len, notes=None,
+            cycle_end=None, created_on=None, doses_taken=0,
+            total_taken=0, last_taken=None):
 
         # append newly created instance
         # index=len(Medication.instances) # use a dict? idk tbh
@@ -150,13 +158,15 @@ class Medication:
         # the number of doses to be taken per cycle
         # int.    ex: 1
         self.doses_pc = safe_cast(int, doses_pc)
-        if self.doses_pc < 1: self.doses_pc = 1
+        if self.doses_pc < 1:
+            self.doses_pc = 1
 
         # the number of days in each cycle
         # (how long until the doses_taken counter is reset)
         # int:   ex: 3
         self.cycle_len = safe_cast(int, cycle_len)
-        if self.cycle_len < 1: self.cycle_len = 1
+        if self.cycle_len < 1:
+            self.cycle_len = 1
 
         # any notes about the medication
         # str.   ex: "take 2 hours after eating"
@@ -184,9 +194,9 @@ class Medication:
 
     def __str__(self):
         string = f"{self.name_generic}"
-        if self.name_brand != None:
+        if self.name_brand is not None:
             string = f"{self.name_brand} ({self.name_generic})"
-        if self.dosage != None:
+        if self.dosage is not None:
             string += f" {self.dosage}"
         return string
 
@@ -203,7 +213,7 @@ class Medication:
             self.total_taken -= 1
 
     def get_lastintake(self):
-        if self.last_taken != None:
+        if self.last_taken is not None:
             modifier = 's'
             base = seconds_passed(self.last_taken)
             if base > 60:
@@ -215,17 +225,17 @@ class Medication:
             if base > 48:
                 base = days_passed(self.last_taken)
                 modifier = ' days'
-            #return f'{base}{modifier}'
+            # return f'{base}{modifier}'
             return f'last taken {base}{modifier} ago'
         else:
             return ''
 
     def get_info(self):
         infostr = f'{str(self)}\n'
-        if self.last_taken != None:
-            infostr+= f'{self.get_lastintake()} '
+        if self.last_taken is not None:
+            infostr += f'{self.get_lastintake()} '
         infostr += f'(counter resets on {timestamp_to_date(self.cycle_end)})'
-        if self.notes != None:
+        if self.notes is not None:
             infostr += f'\nnotes: {self.notes}'
         infostr += f'\ntotal: {self.total_taken}'
         infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
@@ -243,8 +253,8 @@ class Medication:
         '''
         if self.cycle_end < time_now():
             debug_log(f"{self}._update - {self.cycle_end} < {time_now()}")
-
-            date_ce = timestamp_to_date(self.cycle_end) # date cycle ends
+            # date cycle ends
+            date_ce = timestamp_to_date(self.cycle_end)
             debug_log("_update for", str(self), "starting date_ce", date_ce)
 
             '''
@@ -285,6 +295,7 @@ def add_med():
         clear_screen()
         print("creating new medication")
 
+        # pep8 hates this
         name_generic = required_ask(str, 'generic name')
         name_brand   = optional_ask(str, 'brand name')
         dosage       = optional_ask(str, 'dosage')
@@ -296,7 +307,11 @@ def add_med():
         cycle_end    = increase_date(timestamp_to_date(created_on), cycle_len)
         cycle_end    = date_to_timestamp(cycle_end)
 
-        new_med = Medication(name_generic, name_brand, dosage, doses_pc, cycle_len, notes, cycle_end, created_on)
+        new_med = Medication(
+                name_generic, name_brand, dosage,
+                doses_pc, cycle_len, notes, cycle_end,
+                created_on)
+
         print('created', str(new_med))
 
         if input('add another? ').lower() == 'y':
@@ -328,13 +343,13 @@ def load_instances():
         for med in load_data:
             # this is probably not safe :(
             exec_str = 'load_med = Medication('
-            for key,val in med.items():
-                if val == None:
+            for key, val in med.items():
+                if val is None:
                     exec_str += f"{key}=None,"
                 else:
                     exec_str += f"{key}='{val}',"
-
-            exec_str = exec_str[:-1] # cut last comma
+            # cut last comma
+            exec_str = exec_str[:-1]
             exec_str += ')'
             debug_log('load_instances exec_str', exec_str)
             exec(exec_str)
@@ -362,12 +377,12 @@ def loop():
         for word in text.split(' '):
             if not word == '':
                 # if word not a number or '*'
-                if search('\d|\*', word) == None:
+                if search('\d|\*', word) is None:
                     current_action = word
-                    if not current_action in actions:
+                    if current_action not in actions:
                         actions[current_action] = []
                 # check if current_action exists before adding anything
-                elif current_action != None:
+                elif current_action is not None:
                     if word == '*':
                         allnums = [num for num in range(0, len(Medication.instances))]
                         actions[current_action] = allnums
@@ -387,15 +402,15 @@ def loop():
             debug_log('action', action)
             debug_log('nums', nums)
             clear_screen()
-
-            if action == 'q': # quit
+            # quit
+            if action == 'q':
                 list_meds()
                 exit(0)
-
-            if action == 'n': # new
+            # new
+            if action == 'n':
                 add_med()
-
-            if action == 'r': # remove
+            # remove
+            if action == 'r':
                 for index in nums:
                     try:
                         selected = Medication.instances[index]
@@ -406,8 +421,8 @@ def loop():
                         Medication.instances.remove(selected)
                     else:
                         continue
-
-            if action == 't': # take
+            # take
+            if action == 't':
                 for index in nums:
                     # catch index error
                     try:
@@ -415,8 +430,8 @@ def loop():
                     except (IndexError):
                         continue
                     selected.take()
-
-            if action == 'u': # untake
+            # untake
+            if action == 'u':
                 for index in nums:
                     # catch index error
                     try:
@@ -424,8 +439,8 @@ def loop():
                     except (IndexError):
                         continue
                     selected.untake()
-
-            if action == 'i': # info
+            # info
+            if action == 'i':
                 clear_screen()
                 for index in nums:
                     # catch index error
