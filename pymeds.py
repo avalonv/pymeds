@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # TODO:
-# add a calendar, proper day by day tracking? also a prompt to check if the user took the meds they were supposed
-# to when the counter resets and doses_taken is less than doses
-# add an option to not clear the screen or list anything, pass arguments to the file, interpret them and then exit
-# add another option to list all meds and quit
-# add another option to disaply usage and quit
+# remove doses_pc
+# remove doses_taken
 
 from datetime import date, timedelta
 from os import path, system
@@ -62,8 +59,10 @@ def days_passed(timestamp):
     return round(hours_passed(timestamp) / 24)
 
 
-def date_to_timestamp(my_date):
-    return int(time.mktime(time.strptime(str(my_date), '%Y-%m-%d')))
+# def date_to_timestamp(my_date):
+#     return int(time.mktime(time.strptime(str(my_date), '%Y-%m-%d')))
+def date_to_timestamp(my_date, date_format='%Y-%m-%d'):
+    return int(time.mktime(time.strptime(str(my_date), date_format)))
 
 
 def timestamp_to_date(my_timestamp):
@@ -98,8 +97,148 @@ def safe_cast(of_type, val, default=None, rtn_cast=True):
         return default
 
 
+class Medication:
+    instances = []
+
+    def __init__(
+            self, name_generic, name_brand,
+            dosage, cycle_len, notes=None,
+            cycle_end=None, created_on=None,
+            total_taken=0, last_taken=None, schedule=[]):
+
+        # append newly created instance
+        # index=len(Medication.instances) # use a dict? idk tbh
+        Medication.instances.append(self)
+
+        # the name of the medication
+        # string. ex: "estradiol"
+        self.name_generic = safe_cast(str, name_generic)
+
+        # brand name
+        # string. ex: "estradot"
+        self.name_brand = safe_cast(str, name_brand)
+
+        # dosage
+        # string. ex: "100mg"
+        self.dosage = safe_cast(str, dosage)
+
+        # the number of days in each cycle
+        # (how long until the doses_taken counter is reset)
+        # int:   ex: 3
+        self.cycle_len = safe_cast(int, cycle_len)
+        if self.cycle_len < 1:
+            self.cycle_len = 1
+
+        # any notes about the medication
+        # str.   ex: "take 2 hours after eating"
+        self.notes = safe_cast(str, notes)
+
+        # timestamp of when the med was last taken
+        # int. ex: 1556080265
+        self.last_taken = safe_cast(int, last_taken)
+
+        # timestamp of when the current cycle ends and the counter is reset
+        # int. ex: 1556679600
+        self.cycle_end = safe_cast(int, cycle_end)
+
+        # timestamp of when the medication was created
+        # int: ex: 1556766000
+        self.created_on = safe_cast(int, created_on)
+
+        # number of times the meds was taken
+        # int: ex: 30
+        self.total_taken = safe_cast(int, total_taken)
+
+        # a list of timestamps for when a med should be taken
+        exec(f'self.schedule = {schedule}')
+        print("schedule type:", type(self.schedule))
+
+    def __str__(self):
+        string = f"{self.name_generic}"
+        if self.name_brand is not None:
+            string = f"{self.name_brand} ({self.name_generic})"
+        if self.dosage is not None:
+            string += f" {self.dosage}"
+        return string
+
+    def take(self, index=0):
+        self.schedule[index][1] = True
+        self.last_taken = time_now()
+        self.total_taken += 1
+
+    def untake(self, index=0):
+        self.schedule[index][1] = False
+        if self.total_taken > 0:
+            self.total_taken -= 1
+
+    def _update(self):
+        def _advance_ts(ts):
+            # increase ts by x days (86400s) until it is in the future
+            return ts + (86400 * self.cycle_len)
+
+        outdated = False
+        while self.cycle_end < time_now():
+            self.cycle_end = _advance_ts(self.cycle_end)
+            outdated = True
+
+        updated_schedule = []
+        # pair of [timestamp, bool]
+        for time_arr in self.schedule:
+            # only do this if current_cycle has ended
+            # keep old bool otherwise
+            if outdated:
+                time_arr[1] = False
+            if time_arr[0] > time_now():
+                updated_schedule.append(time_arr)
+            else:
+                # future time_arr retains its bool (if it's true it remains true)
+                # but gets pushed into the future (this doesn't matter since
+                # the user only sees the hour and minute)
+                # future_time_arr = [0, False, '']
+                future_ts = time_arr[0]
+                future_bool = time_arr[1]
+                future_hm = time_arr[2]
+                while future_ts < time_now():
+                    future_ts = _advance_ts(future_ts)
+                future_time_arr = [future_ts, future_bool, future_hm]
+                updated_schedule.append(future_time_arr)
+        # put smallest ts (closest to the present) in the beggining so it's
+        # the one we check as the "current" schedule
+        updated_schedule.sort()
+        self.schedule = updated_schedule
+
+        debug_log("time_now:", time_now())
+        debug_log("ts:", [time_arr[0] for time_arr in updated_schedule])
+
+    def get_lastintake(self):
+        if self.last_taken is not None:
+            modifier = 's'
+            base = seconds_passed(self.last_taken)
+            if base > 60:
+                base = minutes_passed(self.last_taken)
+                modifier = 'm'
+            if base > 60:
+                base = hours_passed(self.last_taken)
+                modifier = 'h'
+            if base > 48:
+                base = days_passed(self.last_taken)
+                modifier = ' days'
+            # return f'{base}{modifier}'
+            return f'last taken {base}{modifier} ago'
+        else:
+            return ''
+
+    def get_schedule(self):
+        # this is a copy
+        self._update()
+        return self.schedule
+
+    def check_nextintake(self):
+        self._update()
+
+
 def optional_ask(of_type, prompt):
-    prompt += ': '
+    prompt += ':\n'
     while True:
         choice = input(prompt)
         if choice.lower() == 'q':
@@ -130,167 +269,36 @@ def required_ask(of_type, prompt):
     return safe_cast(of_type, choice)
 
 
-class Medication:
-    instances = []
-
-    def __init__(
-            self, name_generic, name_brand,
-            dosage, doses_pc, cycle_len, notes=None,
-            cycle_end=None, created_on=None, doses_taken=0,
-            total_taken=0, last_taken=None):
-
-        # append newly created instance
-        # index=len(Medication.instances) # use a dict? idk tbh
-        Medication.instances.append(self)
-
-        # the name of the medication
-        # string. ex: "estradiol"
-        self.name_generic = safe_cast(str, name_generic)
-
-        # brand name
-        # string. ex: "estradot"
-        self.name_brand = safe_cast(str, name_brand)
-
-        # dosage
-        # string. ex: "100mg"
-        self.dosage = safe_cast(str, dosage)
-
-        # the number of doses to be taken per cycle
-        # int.    ex: 1
-        self.doses_pc = safe_cast(int, doses_pc)
-        if self.doses_pc < 1:
-            self.doses_pc = 1
-
-        # the number of days in each cycle
-        # (how long until the doses_taken counter is reset)
-        # int:   ex: 3
-        self.cycle_len = safe_cast(int, cycle_len)
-        if self.cycle_len < 1:
-            self.cycle_len = 1
-
-        # any notes about the medication
-        # str.   ex: "take 2 hours after eating"
-        self.notes = safe_cast(str, notes)
-
-        # the number of doses already taken
-        # int.    ex: 1
-        self.doses_taken = safe_cast(int, doses_taken)
-
-        # timestamp of when the med was last taken
-        # int. ex: 1556080265
-        self.last_taken = safe_cast(int, last_taken)
-
-        # timestamp of when the current cycle ends and the counter is reset
-        # int. ex: 1556679600
-        self.cycle_end = safe_cast(int, cycle_end)
-
-        # timestamp of when the medication was created
-        # int: ex: 1556766000
-        self.created_on = safe_cast(int, created_on)
-
-        # number of times the meds was taken
-        # int: ex: 30
-        self.total_taken = safe_cast(int, total_taken)
-
-    def __str__(self):
-        string = f"{self.name_generic}"
-        if self.name_brand is not None:
-            string = f"{self.name_brand} ({self.name_generic})"
-        if self.dosage is not None:
-            string += f" {self.dosage}"
-        return string
-
-    def take(self):
-        self.last_taken = time_now()
-        self.doses_taken += 1
-        self.total_taken += 1
-
-    def untake(self):
-        if self.doses_taken > 0:
-            self.doses_taken -= 1
-
-        if self.total_taken > 0:
-            self.total_taken -= 1
-
-    def get_lastintake(self):
-        if self.last_taken is not None:
-            modifier = 's'
-            base = seconds_passed(self.last_taken)
-            if base > 60:
-                base = minutes_passed(self.last_taken)
-                modifier = 'm'
-            if base > 60:
-                base = hours_passed(self.last_taken)
-                modifier = 'h'
-            if base > 48:
-                base = days_passed(self.last_taken)
-                modifier = ' days'
-            # return f'{base}{modifier}'
-            return f'last taken {base}{modifier} ago'
-        else:
-            return ''
-
-    def get_info(self):
-        infostr = f'{str(self)}\n'
-        if self.last_taken is not None:
-            infostr += f'{self.get_lastintake()} '
-        infostr += f'(counter resets on {timestamp_to_date(self.cycle_end)})'
-        if self.notes is not None:
-            infostr += f'\nnotes: {self.notes}'
-        infostr += f'\ntotal: {self.total_taken}'
-        infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
-        return infostr
-
-    def get_dosesremaining(self):
-        return f"{self.doses_taken}/{self.doses_pc}"
-
-    def _update(self):
-        '''
-        # checks if the cycle_end is in the past
-        # spiro last_taken 2019-04-20 and spiro cycle_end = 1
-          # if spiro last_taken (20) + spiro cycle (1) less than date today (21)
-            # spiro advance cycle
-        '''
-        if self.cycle_end < time_now():
-            debug_log(f"{self}._update - {self.cycle_end} < {time_now()}")
-            # date cycle ends
-            date_ce = timestamp_to_date(self.cycle_end)
-            debug_log("_update for", str(self), "starting date_ce", date_ce)
-
-            '''
-            # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
-            # doses_taken = 0
-            '''
-            # while (date_ce + timedelta(days=self.cycle_len)) < date.today():
-            while date_ce <= date.today():
-                # date_ce = date_ce + timedelta(days=self.cycle_len)
-                debug_log('_update increasing date_ce', date_ce)
-                date_ce = increase_date(date_ce, self.cycle_len)
-            self.doses_taken = 0
-            debug_log('_update updated date_ce is', date_ce)
-
-            # self.cycle_end = int(time.mktime(time.strptime(str(date_ce), '%Y-%m-%d')))
-            self.cycle_end = date_to_timestamp(date_ce)
-
-    def check_nextintake(self):
-        self._update()
-        if self.doses_taken < self.doses_pc:
-            return True
-        else:
-            return False
-
-
-def list_meds():
-    i = 0
-    for med in Medication.instances:
-        if med.check_nextintake():
-            print(f"  {i} - [{med.get_dosesremaining()}] {med} {med.get_lastintake()}")
-        else:
-            print(f"✓ {i} -", strikethrough(f"[{med.get_dosesremaining()}] {med}"))
-        i += 1
-
 
 def add_med():
+    def make_schedule(start_ts, my_len):
+        '''
+        args must be a list of time strings in H:M format. Ex: 07:30 or 23:10
+        '''
+        time_strings = []
+        total = 0
+        for i in range(my_len):
+            while True:
+                choice = required_ask(str, f"intake {total}")
+                # :pray: https://stackoverflow.com/a/51177696/8225672
+                if search('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', choice) is None:
+                    print('invalid format. (24 HH:MM)')
+                    continue
+                else:
+                    time_strings.append(choice)
+                    break
+
+        end_date = str(timestamp_to_date(start_ts))
+        schedule = []
+        for string in time_strings:
+            arr = [0, False, string]
+            date_str = f"{end_date} {string}"
+            ts = date_to_timestamp(date_str, '%Y-%m-%d %H:%M')
+            arr[0] = ts
+            schedule.append(arr)
+
+        return schedule
+
     while True:
         clear_screen()
         print("creating new medication")
@@ -301,16 +309,16 @@ def add_med():
         dosage       = optional_ask(str, 'dosage')
         doses_pc     = required_ask(int, 'take ... dose(s)')
         cycle_len    = required_ask(int, 'every ... day(s)')
-        notes        = optional_ask(str, 'notes')
         created_on   = time_now()
-        # cycle_ends = date today + cycle lenght
+        schedule     = make_schedule(created_on, doses_pc)
+        notes        = optional_ask(str, 'notes')
         cycle_end    = increase_date(timestamp_to_date(created_on), cycle_len)
         cycle_end    = date_to_timestamp(cycle_end)
 
         new_med = Medication(
                 name_generic, name_brand, dosage,
-                doses_pc, cycle_len, notes, cycle_end,
-                created_on)
+                cycle_len, notes, cycle_end,
+                created_on, schedule=schedule)
 
         print('created', str(new_med))
 
@@ -345,9 +353,9 @@ def load_instances():
             exec_str = 'load_med = Medication('
             for key, val in med.items():
                 if val is None:
-                    exec_str += f"{key}=None,"
+                    exec_str += f'{key}=None,'
                 else:
-                    exec_str += f"{key}='{val}',"
+                    exec_str += f'{key}="{val}",'
             # cut last comma
             exec_str = exec_str[:-1]
             exec_str += ')'
@@ -364,6 +372,19 @@ def load_instances():
             exit(1)
 
     return True
+
+
+def list_meds():
+    index = 0
+    for med in Medication.instances:
+        print(f"{index} {med}")
+        schedule = med.get_schedule()
+        for time_arr in schedule:
+            if time_arr[1] is True:
+                print("✓ |- ", strikethrough(f"{time_arr[2]}"), "- TAKEN")
+            else:
+                print(f"  |-  {time_arr[2]} - NOT TAKEN")
+        index += 1
 
 
 def loop():
