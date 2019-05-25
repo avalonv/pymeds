@@ -269,7 +269,6 @@ def required_ask(of_type, prompt):
     return safe_cast(of_type, choice)
 
 
-
 def add_med():
     def make_schedule(start_ts, my_len):
         '''
@@ -330,8 +329,8 @@ def add_med():
 def save_to_file():
     save_data = []
     for med in Medication.instances:
-        attribute_dict = vars(med)
-        save_data.append(attribute_dict)
+        object_dict = vars(med)
+        save_data.append(object_dict)
 
     with open(my_file, 'w') as save_file:
         json.dump(save_data, save_file, indent=2)
