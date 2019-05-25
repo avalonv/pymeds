@@ -101,10 +101,10 @@ class Medication:
     instances = []
 
     def __init__(
-            self, name_generic, name_brand,
-            dosage, cycle_len, notes=None,
+            self, name_generic: str, name_brand: str,
+            dosage: str, cycle_len: int, notes=None,
             cycle_end=None, created_on=None,
-            total_taken=0, last_taken=None, schedule=[]):
+            total_taken=0, last_taken=None, schedule=[], **kwargs):
 
         # append newly created instance
         # index=len(Medication.instances) # use a dict? idk tbh
@@ -342,25 +342,11 @@ def load_instances():
     try:
         with open(my_file, 'r') as load_file:
             try:
-                load_data = json.load(load_file)
+                json_str = json.load(load_file)
+                has_records = True
             # no records exist
             except (ValueError):
                 debug_log('load_instances ValueError: no records found')
-                return None
-
-        for med in load_data:
-            # this is probably not safe :(
-            exec_str = 'load_med = Medication('
-            for key, val in med.items():
-                if val is None:
-                    exec_str += f'{key}=None,'
-                else:
-                    exec_str += f'{key}="{val}",'
-            # cut last comma
-            exec_str = exec_str[:-1]
-            exec_str += ')'
-            debug_log('load_instances exec_str', exec_str)
-            exec(exec_str)
 
     except (FileNotFoundError):
         choice = input(f"'{my_file}' doesn't exist. create? ").lower()
@@ -371,7 +357,9 @@ def load_instances():
             print("quitting")
             exit(1)
 
-    return True
+    if has_records:
+        for object_dict in json_str:
+            Medication(**object_dict)
 
 
 def list_meds():
