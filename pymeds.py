@@ -338,6 +338,8 @@ def save_to_file():
 
 def load_instances():
     # this should only be called ONCE each time the program runs
+    has_records = False
+
     try:
         with open(my_file, 'r') as load_file:
             try:
