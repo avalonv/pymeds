@@ -452,9 +452,9 @@ def loop():
                     try:
                         selected = Medication.instances[index]
                         print(f'{index} - {selected.get_info()}')
+                        input('')
                     except (IndexError):
                         continue
-                input('')
 
             if action == 'h':
                 clear_screen()
