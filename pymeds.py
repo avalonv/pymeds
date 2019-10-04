@@ -312,13 +312,6 @@ def add_med():
         # cycle_ends    = date today + cycle lenght
         cycle_end       = increase_date(timestamp_to_date(created_on), cycle_days)
         cycle_end       = date_to_timestamp(cycle_end)
-        print(f"""
-        generic name: {name_generic}
-        brand name: {name_brand}
-        dosage: {dosage}
-        take {doses_per_cycle} dose(s) every {cycle_days} day(s)
-        notes: {notes}""")
-
 
         new_med = Medication(
                 name_generic, name_brand, dosage, doses_per_cycle,
