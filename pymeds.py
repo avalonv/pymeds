@@ -9,8 +9,8 @@
 from datetime import date, timedelta
 from os import path, system
 from re import search
-from json import load, dump
 from time import time, strptime, mktime
+import json
 
 # GLOBALS (hardcoded for now):
 my_file = path.expanduser('~/.meds.json')
@@ -327,7 +327,7 @@ def save_to_file():
         save_data.append(attribute_dict)
 
     with open(my_file, 'w') as save_file:
-        dump(save_data, save_file, indent=2)
+        json.dump(save_data, save_file, indent=2)
 
 
 def load_instances():
@@ -335,7 +335,7 @@ def load_instances():
     try:
         with open(my_file, 'r') as load_file:
             try:
-                load_data = load(load_file)
+                load_data = json.load(load_file)
             # no records exist
             except (ValueError):
                 debug_log('load_instances ValueError: no records found')
