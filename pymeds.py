@@ -96,6 +96,8 @@ def safe_cast(of_type, val, default=None, rtn_cast=True):
         else:
             return True
     except (ValueError, TypeError):
+        # this is a bit messy and overly complex
+        # might want to remove it
         return default
 
 
@@ -238,7 +240,7 @@ class Medication:
         infostr += f'(counter resets on {timestamp_to_date(self.cycle_end)})'
         if self.notes is not None:
             infostr += f'\nnotes: {self.notes}'
-        infostr += f'\ntotal: {self.total_taken}'
+        infostr += f'\ntotal taken: {self.total_taken}'
         infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
         return infostr
 
