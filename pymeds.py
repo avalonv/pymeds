@@ -375,19 +375,18 @@ def loop():
         actions = {}
         current_action = None
         for word in text.split(' '):
-            if not word == '':
-                # if word not a number or '*'
-                if search('\d|\*', word) is None:
-                    current_action = word
-                    if current_action not in actions:
-                        actions[current_action] = []
-                # check if current_action exists before adding anything
-                elif current_action is not None:
-                    if word == '*':
-                        allnums = [num for num in range(0, len(Medication.instances))]
-                        actions[current_action] = allnums
-                    else:
-                        actions[current_action].append(int(word))
+            # if word not a number or '*'
+            if search('^(\d|\*)$', word) is None:
+                current_action = word
+                if current_action not in actions:
+                    actions[current_action] = []
+            # check if current_action exists before adding anything
+            elif current_action is not None:
+                if word == '*':
+                    allnums = [num for num in range(0, len(Medication.instances))]
+                    actions[current_action] = allnums
+                else:
+                    actions[current_action].append(int(word))
         return actions
 
     if len(Medication.instances) == 0:
