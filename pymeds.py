@@ -330,41 +330,32 @@ def save_to_file():
         json.dump(save_data, save_file, indent=2)
 
 
-def load_instances():
+def load_file():
     # this should only be called ONCE each time the program runs
+    has_records = False
+
     try:
         with open(my_file, 'r') as load_file:
             try:
-                load_data = json.load(load_file)
+                json_str = json.load(load_file)
+                has_records = True
             # no records exist
             except (ValueError):
-                debug_log('load_instances ValueError: no records found')
-                return None
-
-        for med in load_data:
-            # this is probably not safe :(
-            exec_str = 'load_med = Medication('
-            for key, val in med.items():
-                if val is None:
-                    exec_str += f"{key}=None,"
-                else:
-                    exec_str += f"{key}='{val}',"
-            # cut last comma
-            exec_str = exec_str[:-1]
-            exec_str += ')'
-            debug_log('load_instances exec_str', exec_str)
-            exec(exec_str)
+                debug_log('load_file ValueError: no records found')
 
     except (FileNotFoundError):
         choice = input(f"'{my_file}' doesn't exist. create? ").lower()
         if choice in 'y':
-            debug_log('load_instances FileNotFoundError create', my_file)
+            debug_log('load_file FileNotFoundError create', my_file)
             open(my_file, 'w')
         else:
             print("quitting")
             exit(1)
 
-    return True
+    if has_records:
+        for object_dict in json_str:
+            Medication(**object_dict)
+
 
 
 def loop():
@@ -464,9 +455,10 @@ def loop():
 
 if __name__ == "__main__":
     try:
-        load_instances()
+        load_file()
         loop()
         save_to_file()
+        exit(0)
     except (KeyboardInterrupt):
         if save_on_interrupt:
             save_to_file()
