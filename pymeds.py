@@ -16,6 +16,7 @@ import time
 my_file = path.expanduser('~/.meds.json')
 logging = False
 clear = True
+save_on_interrupt = False
 
 
 def usage():
@@ -467,5 +468,7 @@ if __name__ == "__main__":
         loop()
         save_to_file()
     except (KeyboardInterrupt):
+        if save_on_interrupt:
+            save_to_file()
         print('')
         exit(1)
