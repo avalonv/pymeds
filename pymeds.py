@@ -9,10 +9,10 @@
 from datetime import date, timedelta
 from os import path, system
 from re import search
-import json
-import time
+from json import load, dump
+from time import time, strptime, mktime
 
-# hardcoded for now:
+# GLOBALS (hardcoded for now):
 my_file = path.expanduser('~/.meds.json')
 logging = False
 clear = True
