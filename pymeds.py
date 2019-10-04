@@ -375,17 +375,23 @@ def loop():
         actions = {}
         current_action = None
         for word in text.split(' '):
+            is_digit = False
+            is_asterisk = False
             # if word not a number or '*'
-            if search('^(\d|\*)$', word) is None:
+            if search('^\d$', word):
+                is_digit = True
+            elif search('^\*$', word):
+                is_asterisk = True
+            else:
                 current_action = word
                 if current_action not in actions:
                     actions[current_action] = []
             # check if current_action exists before adding anything
-            elif current_action is not None:
-                if word == '*':
+            if current_action is not None:
+                if is_asterisk:
                     allnums = [num for num in range(0, len(Medication.instances))]
                     actions[current_action] = allnums
-                else:
+                elif is_digit:
                     actions[current_action].append(int(word))
         return actions
 
