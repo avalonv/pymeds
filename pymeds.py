@@ -134,8 +134,8 @@ class Medication:
     instances = []
 
     def __init__(
-            self, name_generic, name_brand,
-            dosage, doses_pc, cycle_len, notes=None,
+            self, name_generic: str, name_brand: str,
+            dosage: str, doses_pc: int, cycle_len: int, notes=None,
             cycle_end=None, created_on=None, doses_taken=0,
             total_taken=0, last_taken=None):
 
