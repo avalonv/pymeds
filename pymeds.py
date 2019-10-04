@@ -193,7 +193,7 @@ class Medication:
         # int: ex: 30
         self.total_taken = safe_cast(int, total_taken)
 
-    def __str__(self):
+    def __str__(self) -> str:
         string = f"{self.name_generic}"
         if self.name_brand is not None:
             string = f"{self.name_brand} ({self.name_generic})"
@@ -213,7 +213,7 @@ class Medication:
         if self.total_taken > 0:
             self.total_taken -= 1
 
-    def get_lastintake(self):
+    def get_lastintake(self) -> str:
         if self.last_taken is not None:
             modifier = 's'
             base = seconds_passed(self.last_taken)
@@ -231,7 +231,7 @@ class Medication:
         else:
             return ''
 
-    def get_info(self):
+    def get_info(self) -> str:
         infostr = f'{str(self)}\n'
         if self.last_taken is not None:
             infostr += f'{self.get_lastintake()} '
@@ -242,7 +242,7 @@ class Medication:
         infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
         return infostr
 
-    def get_dosesremaining(self):
+    def get_dosesremaining(self) -> str:
         return f"{self.doses_taken}/{self.doses_pc}"
 
     def _update(self):
@@ -254,7 +254,7 @@ class Medication:
         '''
         if self.cycle_end < time_now():
             debug_log(f"{self}._update - {self.cycle_end} < {time_now()}")
-            # date cycle ends
+            # date_ce = date cycle ends
             date_ce = timestamp_to_date(self.cycle_end)
             debug_log("_update for", str(self), "starting date_ce", date_ce)
 
@@ -273,7 +273,7 @@ class Medication:
             # self.cycle_end = int(mktime(strptime(str(date_ce), '%Y-%m-%d')))
             self.cycle_end = date_to_timestamp(date_ce)
 
-    def check_nextintake(self):
+    def check_nextintake(self) -> bool:
         self._update()
         if self.doses_taken < self.doses_pc:
             return True
@@ -363,6 +363,7 @@ def loop():
         ''' each non numeral character becomes an action, with every numeral to the
         left of it assigned to a list, until the next non numeral character is read
         and so on
+        returns a dict of letters + numbers
         '''
         actions = {}
         current_action = None
