@@ -143,7 +143,7 @@ class Medication:
             self, name_generic: str, name_brand: str,
             dosage: str, doses_per_cycle: int, cycle_days: int, notes=None,
             cycle_end=None, created_on=None, doses_taken=0,
-            total_taken=0, last_taken=None):
+            total_taken=0, last_taken=None, missed_doses=0):
 
         # append newly created instance
         # index=len(Medication.instances) # use a dict? idk tbh
@@ -198,6 +198,8 @@ class Medication:
         # int: ex: 30
         self.total_taken = safe_cast(int, total_taken)
 
+        self.missed_doses = missed_doses
+
     def __str__(self) -> str:
         string = f"{self.name_generic}"
         if self.name_brand is not None:
@@ -232,7 +234,12 @@ class Medication:
                 base = days_passed(self.last_taken)
                 modifier = ' days'
             # return f'{base}{modifier}'
-            return f'last taken {base}{modifier} ago'
+            if self.missed_doses:
+                missed = self.missed_doses
+                self.missed_doses = 0  # reset the warning after running once
+                return f'last taken {base}{modifier} ago, missed {missed} dose(s)'
+            else:
+                return f'last taken {base}{modifier} ago'
         else:
             return ''
 
@@ -244,7 +251,7 @@ class Medication:
         if self.notes is not None:
             infostr += f'\nnotes: {self.notes}'
         infostr += f'\ntotal taken: {self.total_taken}'
-        infostr += f'\nadded: {timestamp_to_date(self.created_on)}'
+        infostr += f'\nadded on {timestamp_to_date(self.created_on)}'
         return infostr
 
     def get_dosesremaining(self) -> str:
@@ -262,6 +269,9 @@ class Medication:
             # date_ce = date cycle ends
             date_ce = timestamp_to_date(self.cycle_end)
             debug_log("_update for", str(self), "starting date_ce", date_ce)
+
+            if self.doses_taken < self.doses_per_cycle:
+                self.missed_doses = self.doses_per_cycle - self.doses_taken
 
             '''
             # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
