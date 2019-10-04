@@ -110,12 +110,15 @@ def optional_ask(of_type, prompt):
                 exit(0)
         if choice == '':
             return None
-        # if checking for an int and the user types '0' this condition will pass (which is not good)
+        # if checking for an int and the user types '0' this condition will
+        # pass (which is not good)
         # elif safe_cast(of_type, choice, default=False) == False:
-        # check against None instead because (0 == False) = True; but (0 == None) = False
+        # check against None instead because (0 == False) = True;
+        # but (0 == None) = False
         elif safe_cast(of_type, choice, rtn_cast=False) is None:
             print(f'(must be {str(of_type)})')
-            # type(of_type).__name__  or .__class__.__name__ doesn't work for some reason?
+            # type(of_type).__name__  or .__class__.__name__
+            # doesn't work for some reason?
             continue
         else:
             break
@@ -138,7 +141,7 @@ class Medication:
 
     def __init__(
             self, name_generic: str, name_brand: str,
-            dosage: str, doses_pc: int, cycle_len: int, notes=None,
+            dosage: str, doses_per_cycle: int, cycle_days: int, notes=None,
             cycle_end=None, created_on=None, doses_taken=0,
             total_taken=0, last_taken=None):
 
@@ -160,16 +163,16 @@ class Medication:
 
         # the number of doses to be taken per cycle
         # int.    ex: 1
-        self.doses_pc = safe_cast(int, doses_pc)
-        if self.doses_pc < 1:
-            self.doses_pc = 1
+        self.doses_per_cycle = safe_cast(int, doses_per_cycle)
+        if self.doses_per_cycle < 1:
+            self.doses_per_cycle = 1
 
         # the number of days in each cycle
         # (how long until the doses_taken counter is reset)
         # int:   ex: 3
-        self.cycle_len = safe_cast(int, cycle_len)
-        if self.cycle_len < 1:
-            self.cycle_len = 1
+        self.cycle_days = safe_cast(int, cycle_days)
+        if self.cycle_days < 1:
+            self.cycle_days = 1
 
         # any notes about the medication
         # str.   ex: "take 2 hours after eating"
@@ -245,7 +248,7 @@ class Medication:
         return infostr
 
     def get_dosesremaining(self) -> str:
-        return f"{self.doses_taken}/{self.doses_pc}"
+        return f"{self.doses_taken}/{self.doses_per_cycle}"
 
     def _update(self):
         '''
@@ -264,11 +267,11 @@ class Medication:
             # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
             # doses_taken = 0
             '''
-            # while (date_ce + timedelta(days=self.cycle_len)) < date.today():
+            # while (date_ce + timedelta(days=self.cycle_days)) < date.today():
             while date_ce <= date.today():
-                # date_ce = date_ce + timedelta(days=self.cycle_len)
+                # date_ce = date_ce + timedelta(days=self.cycle_days)
                 debug_log('_update increasing date_ce', date_ce)
-                date_ce = increase_date(date_ce, self.cycle_len)
+                date_ce = increase_date(date_ce, self.cycle_days)
             self.doses_taken = 0
             debug_log('_update updated date_ce is', date_ce)
 
@@ -277,7 +280,7 @@ class Medication:
 
     def check_nextintake(self) -> bool:
         self._update()
-        if self.doses_taken < self.doses_pc:
+        if self.doses_taken < self.doses_per_cycle:
             return True
         else:
             return False
@@ -299,21 +302,27 @@ def add_med():
         print("creating new medication")
 
         # pep8 hates this
-        name_generic = required_ask(str, 'generic name')
-        name_brand   = optional_ask(str, 'brand name')
-        dosage       = optional_ask(str, 'dosage')
-        doses_pc     = required_ask(int, 'take ... dose(s)')
-        cycle_len    = required_ask(int, 'every ... day(s)')
-        notes        = optional_ask(str, 'notes')
-        created_on   = time_now()
-        # cycle_ends = date today + cycle lenght
-        cycle_end    = increase_date(timestamp_to_date(created_on), cycle_len)
-        cycle_end    = date_to_timestamp(cycle_end)
+        name_generic    = required_ask(str, 'generic name')
+        name_brand      = optional_ask(str, 'brand name')
+        dosage          = optional_ask(str, 'dosage')
+        doses_per_cycle = required_ask(int, 'take ... dose(s)')
+        cycle_days      = required_ask(int, 'every ... day(s)')
+        notes           = optional_ask(str, 'notes')
+        created_on      = time_now()
+        # cycle_ends    = date today + cycle lenght
+        cycle_end       = increase_date(timestamp_to_date(created_on), cycle_days)
+        cycle_end       = date_to_timestamp(cycle_end)
+        print(f"""
+        generic name: {name_generic}
+        brand name: {name_brand}
+        dosage: {dosage}
+        take {doses_per_cycle} dose(s) every {cycle_days} day(s)
+        notes: {notes}""")
+
 
         new_med = Medication(
-                name_generic, name_brand, dosage,
-                doses_pc, cycle_len, notes, cycle_end,
-                created_on)
+                name_generic, name_brand, dosage, doses_per_cycle,
+                cycle_days, notes, cycle_end, created_on)
 
         print('created', str(new_med))
 
