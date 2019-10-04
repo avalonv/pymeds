@@ -43,40 +43,40 @@ def clear_screen():
         debug_log('clear_screen()')
 
 
-def time_now():
+def time_now() -> int:
     return round(time())
 
 
-def seconds_passed(timestamp):
+def seconds_passed(timestamp) -> int:
     return round(time_now() - timestamp)
 
 
-def minutes_passed(timestamp):
+def minutes_passed(timestamp) -> int:
     return round(seconds_passed(timestamp) / 60)
 
 
-def hours_passed(timestamp):
+def hours_passed(timestamp) -> int:
     return round(minutes_passed(timestamp) / 60)
 
 
-def days_passed(timestamp):
+def days_passed(timestamp) -> int:
     return round(hours_passed(timestamp) / 24)
 
 
-def date_to_timestamp(my_date):
+def date_to_timestamp(my_date) -> int:
     return int(mktime(strptime(str(my_date), '%Y-%m-%d')))
 
 
-def timestamp_to_date(my_timestamp):
+def timestamp_to_date(my_timestamp) -> str:
     return date.fromtimestamp(my_timestamp)
 
 
-def increase_date(my_date, num):
+def increase_date(my_date, num) -> int:
     return my_date + timedelta(days=num)
 
 
 # :pray: https://stackoverflow.com/a/25244576/8225672
-def strikethrough(text):
+def strikethrough(text) -> str:
     result = ''
     for c in text:
         result = result + c + '\u0336'
