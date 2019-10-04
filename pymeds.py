@@ -403,14 +403,13 @@ def loop():
         choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, Save & [Q]uit: ").lower()
         for action, nums in parse_choice(choice).items():
             nums.sort(reverse=True)
-            save_to_file()
             debug_log('action', action)
             debug_log('nums', nums)
             clear_screen()
             # quit
             if action == 'q':
                 list_meds()
-                exit(0)
+                return
             # new
             if action == 'n':
                 add_med()
@@ -466,6 +465,7 @@ if __name__ == "__main__":
     try:
         load_instances()
         loop()
+        save_to_file()
     except (KeyboardInterrupt):
         print('')
         exit(1)
