@@ -44,7 +44,7 @@ def clear_screen():
 
 
 def time_now():
-    return round(time.time())
+    return round(time())
 
 
 def seconds_passed(timestamp):
@@ -64,7 +64,7 @@ def days_passed(timestamp):
 
 
 def date_to_timestamp(my_date):
-    return int(time.mktime(time.strptime(str(my_date), '%Y-%m-%d')))
+    return int(mktime(strptime(str(my_date), '%Y-%m-%d')))
 
 
 def timestamp_to_date(my_timestamp):
@@ -270,7 +270,7 @@ class Medication:
             self.doses_taken = 0
             debug_log('_update updated date_ce is', date_ce)
 
-            # self.cycle_end = int(time.mktime(time.strptime(str(date_ce), '%Y-%m-%d')))
+            # self.cycle_end = int(mktime(strptime(str(date_ce), '%Y-%m-%d')))
             self.cycle_end = date_to_timestamp(date_ce)
 
     def check_nextintake(self):
@@ -327,7 +327,7 @@ def save_to_file():
         save_data.append(attribute_dict)
 
     with open(my_file, 'w') as save_file:
-        json.dump(save_data, save_file, indent=2)
+        dump(save_data, save_file, indent=2)
 
 
 def load_instances():
@@ -335,7 +335,7 @@ def load_instances():
     try:
         with open(my_file, 'r') as load_file:
             try:
-                load_data = json.load(load_file)
+                load_data = load(load_file)
             # no records exist
             except (ValueError):
                 debug_log('load_instances ValueError: no records found')
