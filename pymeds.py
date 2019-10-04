@@ -21,7 +21,7 @@ save_on_interrupt = False
 
 def usage():
     print('''usage:
-    [A]ction followed by one or more indexes.
+    [C]ommand followed by one or more indexes.
     Index is the number to the left of each medication listed.
     Ex: `t 0 1 q` will mark meds with indexes zero and one as [t]aken and quit.
     ''')
@@ -368,16 +368,15 @@ def load_file():
             Medication(**object_dict)
 
 
-
 def loop():
     def parse_choice(text):
-        ''' each non numeral character becomes an action, with every numeral to the
+        ''' each non numeral character becomes a command, with every numeral to the
         left of it assigned to a list, until the next non numeral character is read
         and so on
         returns a dict of letters + numbers
         '''
-        actions = {}
-        current_action = None
+        commands = {}
+        current_command = None
         for word in text.split(' '):
             is_digit = False
             is_asterisk = False
@@ -387,17 +386,17 @@ def loop():
             elif search('^\*$', word):
                 is_asterisk = True
             else:
-                current_action = word
-                if current_action not in actions:
-                    actions[current_action] = []
-            # check if current_action exists before adding anything
-            if current_action is not None:
+                current_command = word
+                if current_command not in commands:
+                    commands[current_command] = []
+            # check if current_command exists before adding anything
+            if current_command is not None:
                 if is_asterisk:
                     allnums = [num for num in range(0, len(Medication.instances))]
-                    actions[current_action] = allnums
+                    commands[current_command] = allnums
                 elif is_digit:
-                    actions[current_action].append(int(word))
-        return actions
+                    commands[current_command].append(int(word))
+        return commands
 
     if len(Medication.instances) == 0:
         add_med()
@@ -405,20 +404,20 @@ def loop():
         clear_screen()
         list_meds()
         choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, Save & [Q]uit: ").lower()
-        for action, nums in parse_choice(choice).items():
+        for command, nums in parse_choice(choice).items():
             nums.sort(reverse=True)
-            debug_log('action', action)
+            debug_log('command', command)
             debug_log('nums', nums)
             clear_screen()
             # quit
-            if action == 'q':
+            if command == 'q':
                 list_meds()
                 return
             # new
-            if action == 'n':
+            if command == 'n':
                 add_med()
             # remove
-            if action == 'r':
+            if command == 'r':
                 for index in nums:
                     try:
                         selected = Medication.instances[index]
@@ -430,7 +429,7 @@ def loop():
                     else:
                         continue
             # take
-            if action == 't':
+            if command == 't':
                 for index in nums:
                     # catch index error
                     try:
@@ -439,7 +438,7 @@ def loop():
                         continue
                     selected.take()
             # untake
-            if action == 'u':
+            if command == 'u':
                 for index in nums:
                     # catch index error
                     try:
@@ -448,7 +447,7 @@ def loop():
                         continue
                     selected.untake()
             # info
-            if action == 'i':
+            if command == 'i':
                 clear_screen()
                 for index in nums:
                     # catch index error
@@ -459,7 +458,7 @@ def loop():
                     except (IndexError):
                         continue
 
-            if action == 'h':
+            if command == 'h':
                 clear_screen()
                 usage()
                 input('')
