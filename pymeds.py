@@ -395,7 +395,7 @@ def loop():
     while True:
         clear_screen()
         list_meds()
-        choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, [Q]uit: ").lower()
+        choice = input("[N]ew, [R]emove, [T]ake, [U]ntake, [I]nfo, [H]elp, Save & [Q]uit: ").lower()
         for action, nums in parse_choice(choice).items():
             nums.sort(reverse=True)
             save_to_file()
