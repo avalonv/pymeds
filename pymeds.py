@@ -382,23 +382,18 @@ def loop():
         commands = {}
         current_command = None
         for word in text.split(' '):
-            is_digit = False
-            is_asterisk = False
-            # if word not a number or '*'
-            if search('^\d$', word):
-                is_digit = True
-            elif search('^\*$', word):
-                is_asterisk = True
-            else:
+            if search('^([a-z]|[A-Z])$', word):  # word is a lowercase letter
                 current_command = word
                 if current_command not in commands:
+                    # only assign an empty list to the key if it doesn't exist
                     commands[current_command] = []
-            # check if current_command exists before adding anything
+
+            # check if current_command key exists before adding anything
             if current_command is not None:
-                if is_asterisk:
+                if search('^\*$', word):  # word is an asterisk
                     allnums = [num for num in range(0, len(Medication.instances))]
                     commands[current_command] += allnums
-                elif is_digit:
+                elif search('^\d$', word):  # word is a digit
                     commands[current_command].append(int(word))
         return commands
 
