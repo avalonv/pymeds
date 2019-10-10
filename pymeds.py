@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# vim:foldenable:foldmethod=indent
 # TODO:
 # add a calendar, proper day by day tracking? also a prompt to check if the user took the meds they were supposed
 # to when the counter resets and doses_taken is less than doses
@@ -17,6 +18,7 @@ my_file = path.expanduser('~/.meds.json')
 logging = False  # spits hot garbage
 clear = True  # clears the screen. ignored if logging is True
 save_on_interrupt = True  # saves when the user presses Ctrl+C
+strikethrough = True  # set to False if your font doesn't have strikethrough
 
 
 def usage():
@@ -75,9 +77,11 @@ def increase_date(my_date, num) -> int:
 
 # :pray: https://stackoverflow.com/a/25244576/8225672
 def strikethrough(text) -> str:
+    if not strikethrough:
+        return text
     result = ''
-    for c in text:
-        result = result + c + '\u0336'
+    for char in text:
+        result = result + char + '\u0336'
     return result
 
 
