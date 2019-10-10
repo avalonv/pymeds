@@ -24,9 +24,11 @@ checkmark = '\u2713'  # checkmark symbol. '\u2611' and '\u2714' are cool too
 
 def usage():
     print('''usage:
-    [C]ommand followed by one or more indexes.
-    Index is the number to the left of each medication listed.
-    Ex: `t 0 1 q` will mark meds with indexes zero and one as [t]aken and quit.
+    [C]ommand followed by one or more meds, which are represented by numbers.
+    Ex: `t 0 1 q` will mark meds with numbers zero and one as [t]aken and quit.
+    '*' can be used to select all meds at once.
+    A check mark is displayed when all doses have been taken for the day,
+    otherwise the time since the most recent dose was taken is shown.
     ''')
 
 
@@ -420,9 +422,9 @@ def loop():
                 add_med()
             # remove
             if command == 'r':
-                for index in nums:
+                for i in nums:
                     try:
-                        selected = Medication.instances[index]
+                        selected = Medication.instances[i]
                     except (IndexError):
                         continue
                     print(f"delete '{selected}'?", end=': ')
@@ -432,30 +434,30 @@ def loop():
                         continue
             # take
             if command == 't':
-                for index in nums:
+                for i in nums:
                     # catch index error
                     try:
-                        selected = Medication.instances[index]
+                        selected = Medication.instances[i]
                     except (IndexError):
                         continue
                     selected.take()
             # untake
             if command == 'u':
-                for index in nums:
+                for i in nums:
                     # catch index error
                     try:
-                        selected = Medication.instances[index]
+                        selected = Medication.instances[i]
                     except (IndexError):
                         continue
                     selected.untake()
             # info
             if command == 'i':
                 clear_screen()
-                for index in nums:
+                for i in nums:
                     # catch index error
                     try:
-                        selected = Medication.instances[index]
-                        print(f'{index} - {selected.get_info()}')
+                        selected = Medication.instances[i]
+                        print(f'{i} - {selected.get_info()}')
                         input('')
                     except (IndexError):
                         continue
