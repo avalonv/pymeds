@@ -14,11 +14,11 @@ from time import time, strptime, mktime
 import json
 
 # GLOBALS (hardcoded for now):
-my_file = path.expanduser('~/.meds.json')
+my_file = path.expanduser('~/.meds.json')  # where json data is saved
 logging = False  # spits hot garbage
 clear = True  # clears the screen. ignored if logging is True
 save_on_interrupt = True  # saves when the user presses Ctrl+C
-strikethrough = True  # set to False if your font doesn't have strikethrough
+no_strikethrough = True  # set to True if your font doesn't have strikethrough
 
 
 def usage():
@@ -41,6 +41,16 @@ def clear_screen():
         system('clear')
     else:
         debug_log('clear_screen()')
+
+
+# :pray: https://stackoverflow.com/a/25244576/8225672
+def strikethrough(text) -> str:
+    if no_strikethrough:
+        return text
+    result = ''
+    for char in text:
+        result = result + char + '\u0336'
+    return result
 
 
 def time_now() -> int:
@@ -73,16 +83,6 @@ def timestamp_to_date(my_timestamp) -> str:
 
 def increase_date(my_date, num) -> int:
     return my_date + timedelta(days=num)
-
-
-# :pray: https://stackoverflow.com/a/25244576/8225672
-def strikethrough(text) -> str:
-    if not strikethrough:
-        return text
-    result = ''
-    for char in text:
-        result = result + char + '\u0336'
-    return result
 
 
 # :pray: https://stackoverflow.com/a/6330109/8225672
