@@ -5,7 +5,7 @@
 # to when the counter resets and doses_taken is less than doses
 # add an option to not clear the screen or list anything, pass arguments to the file, interpret them and then exit
 # add another option to list all meds and quit
-# add another option to disaply usage and quit
+# add another option to display usage and quit
 
 from datetime import date, timedelta
 from os import path, system
@@ -19,6 +19,7 @@ logging = False  # spits hot garbage
 clear = True  # clears the screen. ignored if logging is True
 save_on_interrupt = True  # saves when the user presses Ctrl+C
 no_strikethrough = True  # set to True if your font doesn't have strikethrough
+checkmark = '\u2713'  # checkmark symbol. '\u2611' and '\u2714' are cool too
 
 
 def usage():
@@ -300,7 +301,7 @@ def list_meds():
         if med.check_nextintake():
             print(f"  {i} - [{med.get_dosesremaining()}] {med} {med.get_lastintake()}")
         else:
-            print(f"✓ {i} -", strikethrough(f"[{med.get_dosesremaining()}] {med}"))
+            print(f"{checkmark} {i} -", strikethrough(f"[{med.get_dosesremaining()}] {med}"))
         i += 1
 
 
