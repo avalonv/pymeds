@@ -14,9 +14,9 @@ import json
 
 # GLOBALS (hardcoded for now):
 my_file = path.expanduser('~/.meds.json')
-logging = False
-clear = True
-save_on_interrupt = False
+logging = False  # spits hot garbage
+clear = True  # clears the screen. ignored if logging is True
+save_on_interrupt = True  # saves when the user presses Ctrl+C
 
 
 def usage():
@@ -27,8 +27,6 @@ def usage():
     ''')
 
 
-# spits garbage
-# :g/debug_log/d
 def debug_log(*msg):
     if logging:
         print('log:', [item for item in msg])
@@ -258,12 +256,10 @@ class Medication:
         return f"{self.doses_taken}/{self.doses_per_cycle}"
 
     def _update(self):
-        '''
         # checks if the cycle_end is in the past
-        # spiro last_taken 2019-04-20 and spiro cycle_end = 1
-          # if spiro last_taken (20) + spiro cycle (1) less than date today (21)
-            # spiro advance cycle
-        '''
+        # ex: spiro last_taken = 2019-04-20 and spiro cycle_end = 1
+        # if spiro last_taken (20) + spiro cycle (1) less than date today (21)
+        # spiro advances to next cycle_end
         if self.cycle_end < time_now():
             debug_log(f"{self}._update - {self.cycle_end} < {time_now()}")
             # date_ce = date cycle ends
@@ -273,10 +269,8 @@ class Medication:
             if self.doses_taken < self.doses_per_cycle:
                 self.missed_doses = self.doses_per_cycle - self.doses_taken
 
-            '''
             # cycle_end = (cycle_end + cycle) until cycle_end + cycle > date_today
             # doses_taken = 0
-            '''
             # while (date_ce + timedelta(days=self.cycle_days)) < date.today():
             while date_ce <= date.today():
                 # date_ce = date_ce + timedelta(days=self.cycle_days)
