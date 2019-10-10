@@ -18,7 +18,7 @@ my_file = path.expanduser('~/.meds.json')  # where json data is saved
 logging = False  # spits hot garbage
 clear = True  # clears the screen. ignored if logging is True
 save_on_interrupt = True  # saves when the user presses Ctrl+C
-no_strikethrough = True  # set to True if your font doesn't have strikethrough
+no_strikethrough = False  # set to True if your font doesn't have strikethrough
 checkmark = '\u2713'  # checkmark symbol. '\u2611' and '\u2714' are cool too
 
 
