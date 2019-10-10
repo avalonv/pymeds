@@ -397,7 +397,7 @@ def loop():
             if current_command is not None:
                 if is_asterisk:
                     allnums = [num for num in range(0, len(Medication.instances))]
-                    commands[current_command] = allnums
+                    commands[current_command] += allnums
                 elif is_digit:
                     commands[current_command].append(int(word))
         return commands
