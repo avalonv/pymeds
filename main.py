@@ -130,14 +130,9 @@ def add_med():
         doses_per_cycle = required_ask(int, 'take ... dose(s)')
         cycle_days      = required_ask(int, 'every ... day(s)')
         notes           = optional_ask(str, 'notes')
-        created_on      = time_now()
-        # cycle_ends    = date today + cycle lenght
-        cycle_end       = increase_date(timestamp_to_date(created_on), cycle_days)
-        cycle_end       = date_to_timestamp(cycle_end)
 
-        new_med = Medication(
-                name_generic, name_brand, dosage, doses_per_cycle,
-                cycle_days, notes, cycle_end, created_on)
+        new_med = Medication(name_generic, name_brand, dosage, doses_per_cycle,
+                             cycle_days, notes)
 
         print('created', str(new_med))
 
