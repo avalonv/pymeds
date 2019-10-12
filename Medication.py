@@ -104,52 +104,52 @@ class Medication:
 
         # the name of the medication
         # string. ex: "estradiol"
-        self.name_generic = safe_cast(str, name_generic)
+        self.name_generic = name_generic
 
         # brand name
         # string. ex: "estradot"
-        self.name_brand = safe_cast(str, name_brand)
+        self.name_brand = name_brand
 
         # dosage
         # string. ex: "100mg"
-        self.dosage = safe_cast(str, dosage)
+        self.dosage = dosage
 
         # the number of doses to be taken per cycle
         # int.    ex: 1
-        self.doses_per_cycle = safe_cast(int, doses_per_cycle)
+        self.doses_per_cycle = doses_per_cycle
         if self.doses_per_cycle < 1:
             self.doses_per_cycle = 1
 
         # the number of days in each cycle
         # (how long until the doses_taken counter is reset)
         # int:   ex: 3
-        self.cycle_days = safe_cast(int, cycle_days)
+        self.cycle_days = cycle_days
         if self.cycle_days < 1:
             self.cycle_days = 1
 
         # any notes about the medication
         # str.   ex: "take 2 hours after eating"
-        self.notes = safe_cast(str, notes)
+        self.notes = notes
 
         # the number of doses already taken
         # int.    ex: 1
-        self.doses_taken = safe_cast(int, doses_taken)
+        self.doses_taken = doses_taken
 
         # timestamp of when the med was last taken
         # int. ex: 1556080265
-        self.last_taken = safe_cast(int, last_taken)
+        self.last_taken = last_taken
 
         # timestamp of when the current cycle ends and the counter is reset
         # int. ex: 1556679600
-        self.cycle_end = safe_cast(int, cycle_end)
+        self.cycle_end = cycle_end
 
         # timestamp of when the medication was created
         # int: ex: 1556766000
-        self.created_on = safe_cast(int, created_on)
+        self.created_on = created_on
 
         # number of times the meds was taken
         # int: ex: 30
-        self.total_taken = safe_cast(int, total_taken)
+        self.total_taken = total_taken
 
         self.missed_doses = missed_doses
 
