@@ -45,7 +45,7 @@ class Medication:
     def __init__(
             self, name_generic: str, name_brand: str,
             dosage: str, doses_per_cycle: int, cycle_days: int, notes=None,
-            cycle_end=None, created_on=None, doses_taken=0,
+            cycle_end=None, created_on=time_now(), doses_taken=0,
             total_taken=0, last_taken=None, missed_doses=0):
 
         # append newly created instance
