@@ -1,8 +1,11 @@
 from time import time, strptime, mktime
 from datetime import date, timedelta
 
+
+# this function is already defined in main.py, bad code 101
 def debug_log(*msg):
     print('log:', [item for item in msg])
+
 
 def time_now() -> int:
     return round(time())
@@ -24,16 +27,16 @@ def days_passed(timestamp) -> int:
     return round(hours_passed(timestamp) / 24)
 
 
-def date_to_timestamp(my_date) -> int:
-    return int(mktime(strptime(str(my_date), '%Y-%m-%d')))
+def date_to_timestamp(my_datestr) -> int:
+    return int(mktime(strptime(str(my_datestr), '%Y-%m-%d')))
 
 
 def timestamp_to_date(my_timestamp) -> str:
     return date.fromtimestamp(my_timestamp)
 
 
-def increase_date(my_date, num) -> int:
-    return my_date + timedelta(days=num)
+def increase_date(my_datestr, num) -> int:
+    return my_datestr + timedelta(days=num)
 
 
 class Medication:
