@@ -36,59 +36,6 @@ def increase_date(my_date, num) -> int:
     return my_date + timedelta(days=num)
 
 
-# :pray: https://stackoverflow.com/a/6330109/8225672
-# this function does way too much shit at once
-def safe_cast(of_type, val, default=None, rtn_cast=True):
-    # for the love of god don't make None a string
-    if val is None:
-        return default
-    try:
-        cast_val = of_type(val)
-        if rtn_cast:
-            return cast_val
-        else:
-            return True
-    except (ValueError, TypeError):
-        # this is a bit messy and overly complex
-        # might want to remove it
-        return default
-
-
-def optional_ask(of_type, prompt):
-    prompt += ': '
-    while True:
-        choice = input(prompt)
-        if choice.lower() == 'q':
-            if input('quit? ').lower() in 'y':
-                exit(0)
-        if choice == '':
-            return None
-        # if checking for an int and the user types '0' this condition will
-        # pass (which is not good)
-        # elif safe_cast(of_type, choice, default=False) == False:
-        # check against None instead because (0 == False) = True;
-        # but (0 == None) = False
-        elif safe_cast(of_type, choice, rtn_cast=False) is None:
-            print(f'(must be {str(of_type)})')
-            # type(of_type).__name__  or .__class__.__name__
-            # doesn't work for some reason?
-            continue
-        else:
-            break
-    return safe_cast(of_type, choice)
-
-
-def required_ask(of_type, prompt):
-    prompt += ' *'
-    while True:
-        choice = optional_ask(of_type, prompt)
-        if choice is not None or '':
-            break
-        else:
-            print("this field can't be empty")
-    return safe_cast(of_type, choice)
-
-
 class Medication:
     instances = []
 
