@@ -2,7 +2,7 @@ from time import time, strptime, mktime
 from datetime import date, timedelta
 
 
-# this function is already defined in main.py, bad code 101
+# this function is also defined in main.py, bad code 101
 def debug_log(*msg):
     print('log:', [item for item in msg])
 
@@ -37,6 +37,10 @@ def timestamp_to_date(my_timestamp) -> str:
 
 def increase_date(my_datestr, num) -> int:
     return my_datestr + timedelta(days=num)
+
+
+def new_cycle(num) -> int:
+    return date_to_timestamp(increase_date(date.today(), num))
 
 
 class Medication:
@@ -91,6 +95,8 @@ class Medication:
 
         # timestamp of when the current cycle ends and the counter is reset
         # int. ex: 1556679600
+        if cycle_end is None:
+            cycle_end = new_cycle(cycle_days)
         self.cycle_end = cycle_end
 
         # timestamp of when the medication was created
