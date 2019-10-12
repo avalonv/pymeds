@@ -9,7 +9,7 @@
 
 from os import path, system
 from re import search
-from Medication import Medication
+from medication import Medication
 import json
 
 # GLOBALS (hardcoded for now):
