@@ -2,9 +2,10 @@ from time import time, strptime, mktime
 from datetime import date, timedelta
 
 
-# this function is also defined in main.py, bad code 101
+# this function is already defined in main.py, bad code 101
+# define it again so python doesn't complain
 def debug_log(*msg):
-    print('log:', [item for item in msg])
+    pass
 
 
 def time_now() -> int:
