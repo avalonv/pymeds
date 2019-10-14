@@ -1,4 +1,4 @@
-from time import time, strptime, mktime
+from time import strptime, mktime, time as time_now
 from datetime import date, timedelta
 
 
@@ -6,10 +6,6 @@ from datetime import date, timedelta
 # define it again so python doesn't complain
 def debug_log(*msg):
     pass
-
-
-def time_now() -> int:
-    return round(time())
 
 
 def seconds_passed(timestamp) -> int:
