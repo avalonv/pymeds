@@ -36,8 +36,8 @@ def increase_date(my_datestr, num) -> int:
     return my_datestr + timedelta(days=num)
 
 
-def new_cycle(num) -> int:
-    return date_to_timestamp(increase_date(date.today(), num))
+def new_cycle(cycle_days) -> int:
+    return date_to_timestamp(increase_date(date.today(), cycle_days))
 
 
 class Medication:
