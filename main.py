@@ -115,7 +115,7 @@ def required_ask(of_type, prompt):
             break
         else:
             print("this field can't be empty")
-    return safe_cast(of_type, choice)
+    return choice
 
 
 def add_med():
