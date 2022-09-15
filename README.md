@@ -4,6 +4,8 @@
 
 Basic CLI program to keep track of medication routines.
 
+I wrote this when I was taking like 6 different medications a day and had a very terminal centric workflow, where it made sense to do with everything with a CLI script. Nowadays I have little use for this, but if I were to redesign it I would probably use an actual GUI (or at least a TUI) with a crontab service to send notifications.
+
 ### Usage:
 
 ```
